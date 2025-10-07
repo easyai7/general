@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 강의 홈페이지</title>
+    <style>
+        /* 기본 스타일 초기화 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Noto Sans KR', sans-serif, Arial;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #004080;
+            color: white;
+            padding: 10px 20px;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover {
+            background-color: #00264d;
+        }
+        main {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 6px;
+        }
+        h1, h2 {
+            color: #004080;
+            margin-bottom: 20px;
+        }
+        section {
+            margin-bottom: 40px;
+        }
+        footer {
+            background-color: #004080;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        /* 반응형 */
+        @media (max-width: 600px) {
+            nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+            main {
+                margin: 80px 10px 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#home">홈</a>
+            <a href="#courses">강의소개</a>
+            <a href="#instructor">강사소개</a>
+            <a href="#contact">연락처</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home">
+            <h1>AI 강의에 오신 것을 환영합니다</h1>
+            <p>이 사이트는 AI 기본 개념부터 활용까지 체계적으로 배우는 강의 자료를 제공합니다.</p>
+        </section>
+
+        <section id="courses">
+            <h2>강의소개</h2>
+            <ul>
+                <li>Python 기초 프로그래밍</li>
+                <li>머신러닝 입문과 실습</li>
+                <li>딥러닝과 신경망 이해</li>
+                <li>AI 서비스 개발 프로젝트</li>
+            </ul>
+        </section>
+
+        <section id="instructor">
+            <h2>강사소개</h2>
+            <p>강사: 홍길동</p>
+            <p>경력: AI 교육 경력 10년, 주요 프로젝트 다수 진행</p>
+            <p>소개: 실무와 교육을 겸비한 AI 전문가입니다.</p>
+        </section>
+
+        <section id="contact">
+            <h2>연락처</h2>
+            <p>이메일: ai.instructor@example.com</p>
+            <p>전화: 010-1234-5678</p>
+        </section>
+    </main>
+    
+    <footer>
+        &copy; 2025 AI 강의 홈페이지. 모든 권리 보유.
+    </footer>
+</body>
+</html>
+이 HTML 파일은 강의용 기본 홈페이지 템플릿으로 활용하기 적합합니다. 메뉴 클릭 시 해당 위치로 이동하고, 깔끔한 디자인과 반응형 구성을 포함합니다. 필요하면 추가 기능도 덧붙여 드릴 수 있습니다.AI 강의용으로 메뉴와 기본 레이아웃을 갖춘 홈페이지 예제를 만들었습니다. 상단에 메뉴(홈, 강의소개, 강사소개, 연락처)가 있고 메인 콘텐츠와 고정 풋터가 포함된 반응형 구조입니다.
+
+xml
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 강의 홈페이지</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans KR', sans-serif, Arial;
+            background-color: #f9f9f9; color: #333; line-height: 1.6;
+        }
+        header {
+            background-color: #004080; color: white; padding: 10px 20px;
+        }
+        nav {
+            display: flex; justify-content: center; gap: 30px;
+        }
+        nav a {
+            color: white; text-decoration: none; font-weight: 600;
+            padding: 8px 15px; border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover { background-color: #00264d; }
+        main {
+            max-width: 1000px; margin: 30px auto; padding: 0 20px;
+            background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 6px;
+        }
+        h1, h2 { color: #004080; margin-bottom: 20px; }
+        section { margin-bottom: 40px; }
+        footer {
+            background-color: #004080; color: white; text-align: center;
+            padding: 15px; position: fixed; bottom: 0; width: 100%;
+        }
+        @media (max-width: 600px) {
+            nav { flex-direction: column; gap: 10px; }
+            main { margin: 80px 10px 70px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#home">홈</a>
+            <a href="#courses">강의소개</a>
+            <a href="#instructor">강사소개</a>
+            <a href="#contact">연락처</a>
+        </nav>
+    </header>
+    <main>
+        <section id="home">
+            <h1>AI 강의에 오신 것을 환영합니다</h1>
+            <p>이 사이트는 AI 기본 개념부터 활용까지 체계적으로 배우는 강의 자료를 제공합니다.</p>
+        </section>
+        <section id="courses">
+            <h2>강의소개</h2>
+            <ul>
+                <li>Python 기초 프로그래밍</li>
+                <li>머신러닝 입문과 실습</li>
+                <li>딥러닝과 신경망 이해</li>
+                <li>AI 서비스 개발 프로젝트</li>
+            </ul>
+        </section>
+        <section id="instructor">
+            <h2>강사소개</h2>
+            <p>강사: 홍길동</p>
+            <p>경력: AI 교육 경력 10년, 주요 프로젝트 다수 진행</p>
+            <p>소개: 실무와 교육을 겸비한 AI 전문가입니다.</p>
+        </section>
+        <section id="contact">
+            <h2>연락처</h2>
+            <p>이메일: ai.instructor@example.com</p>
+            <p>전화: 010-1234-5678</p>
+        </section>
+    </main>
+    <footer>
+        &copy; 2025 AI 강의 홈페이지. 모든 권리 보유.
+    </footer>
+</body>
+</html>
