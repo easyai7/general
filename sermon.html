@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설교 복습 | 들을 귀 있는 자</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500&display=swap');
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --dark: #1A1410;
+    --dark2: #2C2418;
+    --parchment: #F7F3EC;
+    --parchment2: #EDE6D8;
+    --text: #3D2E1E;
+    --text-light: #7A6A58;
+    --accent: #8B1A1A;
+    --red-dark: #5C1010;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--parchment);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 22px;
+  }
+
+  .header {
+    background: var(--dark);
+    padding: 28px 24px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 20px,
+      rgba(201,168,76,0.04) 20px, rgba(201,168,76,0.04) 21px);
+  }
+  .header-label { font-size: 18px; font-weight: 300; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
+  .header-title { font-family: 'Noto Serif KR', serif; font-size: 32px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 6px; }
+  .header-ref { font-size: 22px; color: var(--gold-light); font-weight: 300; letter-spacing: 1px; }
+  .gold-bar { height: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin-top: 20px; }
+
+  /* 긴장 박스 */
+  .tension-box {
+    margin: 20px 16px 0;
+    background: var(--red-dark);
+    border-radius: 12px 12px 0 0;
+    padding: 22px;
+    position: relative; overflow: hidden;
+  }
+  .tension-box::before {
+    content: '✕';
+    font-size: 120px; color: rgba(255,255,255,0.04);
+    position: absolute; right: 10px; top: -10px; line-height: 1;
+  }
+  .tension-label { font-size: 16px; letter-spacing: 3px; color: #ffaaaa; text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+  .tension-text { font-family: 'Noto Serif KR', serif; font-size: 24px; font-weight: 700; color: #fff; line-height: 1.7; }
+  .tension-sub { margin-top: 12px; font-size: 20px; color: rgba(255,200,200,0.85); line-height: 1.8; font-weight: 300; }
+
+  .grace-box {
+    margin: 0 16px 20px;
+    background: var(--dark2);
+    border-radius: 0 0 12px 12px;
+    padding: 22px;
+    border-top: 2px solid var(--gold);
+  }
+  .grace-label { font-size: 16px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+  .grace-text { font-family: 'Noto Serif KR', serif; font-size: 26px; font-weight: 700; color: #fff; line-height: 1.7; }
+  .grace-sub { margin-top: 12px; font-size: 20px; color: var(--gold-light); line-height: 1.8; font-weight: 300; }
+
+  /* TABS */
+  .tabs { display: flex; margin: 0 16px; gap: 4px; }
+  .tab {
+    flex: 1; padding: 12px 4px; font-size: 20px; font-weight: 500;
+    text-align: center; background: var(--parchment2); color: var(--text-light);
+    border: none; border-radius: 8px 8px 0 0; cursor: pointer; transition: all 0.2s;
+  }
+  .tab.active { background: var(--dark); color: var(--gold); }
+
+  .panel {
+    margin: 0 16px 24px; background: #fff;
+    border-radius: 0 0 12px 12px; padding: 22px;
+    display: none; border: 1px solid var(--parchment2); border-top: none;
+  }
+  .panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+  /* 오해 박스 */
+  .misread-box {
+    background: #fff5f5; border: 1px solid #ffcccc;
+    border-radius: 10px; padding: 18px; margin-bottom: 24px;
+  }
+  .misread-label { font-size: 18px; letter-spacing: 2px; color: var(--accent); font-weight: 600; margin-bottom: 10px; }
+  .misread-text { font-size: 22px; color: var(--text); line-height: 1.9; }
+
+  /* 설교 핵심 카드 */
+  .note-point {
+    margin-bottom: 24px; padding-bottom: 24px;
+    border-bottom: 1px dashed var(--parchment2);
+  }
+  .note-point:last-child { border-bottom: none; margin-bottom: 0; }
+  .note-tag { display: inline-block; background: var(--dark); color: var(--gold); font-size: 17px; letter-spacing: 1px; padding: 4px 10px; border-radius: 4px; margin-bottom: 10px; font-weight: 500; }
+  .note-tag.red { background: var(--red-dark); color: #ffaaaa; }
+  .note-text { font-size: 22px; color: var(--text); line-height: 1.9; }
+  .note-verse-ref { margin-top: 8px; font-size: 20px; color: var(--accent); font-style: italic; }
+
+  /* TTS 버튼 */
+  .tts-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 12px;
+    background: var(--dark); color: var(--gold);
+    border: none; border-radius: 20px;
+    padding: 8px 16px; font-size: 18px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .tts-btn:hover { background: #2e1f12; }
+  .tts-btn.playing { background: var(--accent); color: #fff; }
+  .tts-btn .icon { font-size: 18px; }
+
+  /* 주간 묵상 */
+  .day-card { margin-bottom: 20px; border-left: 3px solid var(--gold); padding-left: 16px; }
+  .day-card.red { border-left-color: var(--accent); }
+  .day-label { font-size: 18px; letter-spacing: 2px; color: var(--gold); font-weight: 600; text-transform: uppercase; margin-bottom: 6px; }
+  .day-card.red .day-label { color: var(--accent); }
+  .day-theme { font-family: 'Noto Serif KR', serif; font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .day-content { font-size: 22px; color: var(--text-light); line-height: 1.8; }
+  .day-verse { margin-top: 8px; font-size: 20px; color: var(--accent); font-style: italic; }
+
+  /* 소그룹 나눔 */
+  .question-intro { background: var(--dark); border-radius: 10px; padding: 20px; margin-bottom: 22px; text-align: center; }
+  .question-intro-top { font-size: 17px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 12px; }
+  .question-intro-text { font-family: 'Noto Serif KR', serif; font-size: 23px; font-weight: 600; color: #fff; line-height: 1.8; }
+
+  .question-card { margin-bottom: 18px; background: var(--parchment); border-radius: 10px; padding: 18px; border: 1px solid var(--parchment2); }
+  .question-card.red { border-left: 4px solid var(--accent); }
+  .question-card.gold { border-left: 4px solid var(--gold); }
+  .q-number { display: inline-block; width: 30px; height: 30px; background: var(--dark); color: var(--gold); font-size: 16px; font-weight: 700; border-radius: 50%; text-align: center; line-height: 30px; margin-bottom: 10px; }
+  .q-text { font-family: 'Noto Serif KR', serif; font-size: 23px; font-weight: 600; color: var(--text); line-height: 1.7; margin-bottom: 10px; }
+  .q-guide { font-size: 20px; color: var(--text-light); line-height: 1.7; padding-left: 14px; border-left: 2px solid var(--gold-light); }
+
+  .q-prayer { margin-top: 22px; background: var(--dark); border-radius: 10px; padding: 18px; text-align: center; }
+  .q-prayer-label { font-size: 17px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
+  .q-prayer-text { font-size: 22px; color: #fff; line-height: 1.8; font-weight: 300; }
+
+  /* 재생 표시 */
+  .now-playing {
+    display: none;
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--dark); color: var(--gold);
+    padding: 10px 22px; border-radius: 30px;
+    font-size: 18px; font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 100;
+    white-space: nowrap;
+  }
+  .now-playing.show { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
+  #weekly .day-card, #notes .note-point { animation: none; }
+
+  .footer { text-align: center; padding: 18px; font-size: 18px; color: var(--text-light); letter-spacing: 1px; margin-bottom: 60px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">설교 복습</div>
+  <div class="header-title">들을 귀 있는 자</div>
+  <div class="header-ref">마가복음 4:1–9</div>
+  <div class="gold-bar"></div>
+</div>
+
+<div class="tension-box">
+  <div class="tension-label">먼저 직면해야 할 사실</div>
+  <div class="tension-text">전 인류는 이미 심판받아<br>버려진 상태에 있다</div>
+  <div class="tension-sub">
+    들어도 깨닫지 못하고, 보아도 알지 못하도록.<br>
+    하나님을 거부한 인간에게 내려진 심판의 결과입니다.<br>
+    스스로 옥토가 될 가능성은 처음부터 없었습니다.
+  </div>
+</div>
+<div class="grace-box">
+  <div class="grace-label">그러나 — 본문이 선포하는 복음</div>
+  <div class="grace-text">그 절망 속에서<br>조건 없이 옥토로 불리었다</div>
+  <div class="grace-sub">
+    "하나님 나라의 비밀을 너희에게는 주었으나" (막 4:11)<br>
+    옥토가 되어라 — 가 아니라<br>
+    <strong style="color:var(--gold)">너희는 이미 옥토이니라.</strong>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('notes', this)">설교 핵심</button>
+  <button class="tab" onclick="showTab('weekly', this)">주간 묵상</button>
+  <button class="tab" onclick="showTab('sharing', this)">소그룹 나눔</button>
+</div>
+
+<!-- 설교 핵심 -->
+<div class="panel active" id="notes">
+
+  <div class="misread-box">
+    <div class="misread-label">⚠ 이 본문에 대한 흔한 오해</div>
+    <div class="misread-text">
+      "마음의 돌을 제거하고 좋은 밭이 되어 열매를 맺으라" —
+      수십 년 동안 이렇게 설교되어 왔습니다.
+      틀린 말이 아니기에 더 위험합니다.
+      구원의 무게 중심이 슬그머니 인간에게로 넘어가
+      복음의 역설이 전래동화가 되어버립니다.
+    </div>
+    <button class="tts-btn" onclick="speak(this, 'misread')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="note-point">
+    <div class="note-tag red">해석의 열쇠 — 막 4:11-12</div>
+    <div class="note-text">제자들이 "왜 비유로만 말씀하십니까?" 묻자 예수님은 "그들이 못 알아듣도록 일부러 그러신다"고 하셨습니다. 길가·돌밭·가시밭은 깨달음이 금지된 외인, 옥토는 깨달음이 허락된 제자들입니다. 이 두 절을 떼어내면 비유 전체가 전혀 다른 설교가 됩니다.</div>
+    <div class="note-verse-ref">막 4:11–12 / 마 13:10–13</div>
+    <button class="tts-btn" onclick="speak(this, 'key')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="note-point">
+    <div class="note-tag red">왜 그렇게 하셨는가 — 사 6:9-10의 배경</div>
+    <div class="note-text">예수님이 인용하신 이사야 6장 — 이사야는 처음부터 실패가 예고된 채 보냄받은 선지자였습니다. 하나님의 최선을 끝끝내 배신한 이스라엘을 향한 상한 아버지의 마음이 반어법으로 터져나온 것입니다. "행여 깨닫고 돌이킬까 봐 겁난다"는 말은 하나님의 본심이 아닌, 배신당한 자의 상한 마음입니다.</div>
+    <div class="note-verse-ref">사 6:9–10 / 사 1:1–6 / 마 23:37</div>
+    <button class="tts-btn" onclick="speak(this, 'isaiah')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="note-point">
+    <div class="note-tag red">세 가지 나쁜 밭 = 심판의 결과</div>
+    <div class="note-text">길가·돌밭·가시밭은 인간의 노력으로 고칠 수 있는 상태가 아닙니다. 하나님을 거부한 전 인류에게 내려진 심판으로 개선의 여지조차 차단된 상태입니다. 이스라엘의 완악함으로 구원은 이방인을 향하게 되었고, 우리는 그 심판받은 세상 한복판에서 불린 자들입니다.</div>
+    <div class="note-verse-ref">롬 11:11–12 / 롬 11:17–22</div>
+    <button class="tts-btn" onclick="speak(this, 'judgment')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="note-point">
+    <div class="note-tag">은혜의 핵심 — 너희는 옥토이니라</div>
+    <div class="note-text">막 4:11이 이 해석의 직접적 근거입니다. "하나님 나라의 비밀을 너희에게는 주었으나 외인에게는 모든 것을 비유로 한다" — 여기서 길가·돌밭·가시밭은 깨달음이 금지된 외인이고, 옥토는 깨달음이 허락된 제자들임이 분명하게 드러납니다. 옥토는 인간이 만드는 것이 아니라 하나님께서 이미 확정하신 상태입니다. 모든 것이 버려진 그 상황에서 하나님 나라의 비밀이 제자들에게만 열렸습니다. 이유가 설명되지 않습니다. 오직 은혜입니다. 복음을 들어도 믿지 않는 사람들이 넘치는 이 세상에서, 예수님이 나의 구주로 믿어졌다면 — 하나님이 먼저 옥토로 준비하셨기 때문입니다.</div>
+    <div class="note-verse-ref">막 4:11 / 롬 9:15–16</div>
+    <button class="tts-btn" onclick="speak(this, 'grace')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="note-point">
+    <div class="note-tag">설교자의 결론적 적용</div>
+    <div class="note-text">예수님의 비유는 여기까지 말씀합니다 — "너희는 은혜로 열매 맺는 인생 안에 있다." 낭비하지 마십시오. 동기는 부담이 아니라 감사와 기쁨입니다. 옥토가 되는 책임이 아니라, 옥토로서 열매 맺는 책임입니다.</div>
+    <div class="note-verse-ref">히 2:3 / 고전 3:15 / 막 4:20</div>
+    <button class="tts-btn" onclick="speak(this, 'conclusion')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+</div>
+
+<!-- 주간 묵상 -->
+<div class="panel" id="weekly">
+
+  <div class="day-card red">
+    <div class="day-label">월요일</div>
+    <div class="day-theme">나는 어떤 상태였는가</div>
+    <div class="day-content">복음이 들려도 깨닫지 못했던 때를 생각해 보십시오. 그것이 의지의 문제가 아니라 심판받은 상태였음을 묵상하십시오. 그 절망의 깊이가 느껴질수록 은혜의 무게도 커집니다.</div>
+    <div class="day-verse">사 6:9 — "듣기는 들어도 깨닫지 못할 것이요"</div>
+    <button class="tts-btn" onclick="speak(this, 'mon')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="day-card red">
+    <div class="day-label">화요일</div>
+    <div class="day-theme">전 인류가 버려진 상태다</div>
+    <div class="day-content">복음을 들어도 믿지 않는 주변 사람들 — 그것이 그들만의 완고함이 아니라 심판의 결과임을 묵상하십시오. 이 사실이 전도에 대한 나의 자세를 어떻게 바꿉니까?</div>
+    <div class="day-verse">롬 11:32 — "하나님이 모든 사람을 순종하지 아니하는 가운데 가두어 두심은"</div>
+    <button class="tts-btn" onclick="speak(this, 'tue')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="day-card">
+    <div class="day-label">수요일</div>
+    <div class="day-theme">조건 없이 불리었다</div>
+    <div class="day-content">내가 믿게 된 이유를 설명할 수 있습니까? 마가복음 4장 11절은 이유를 설명하지 않습니다. 오직 은혜입니다. 이 사실 앞에 오늘 조용히 무릎을 꿇으십시오.</div>
+    <div class="day-verse">막 4:11 — "하나님 나라의 비밀을 너희에게는 주었으나"</div>
+    <button class="tts-btn" onclick="speak(this, 'wed')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="day-card">
+    <div class="day-label">목요일</div>
+    <div class="day-theme">배신당하신 하나님</div>
+    <div class="day-content">하나님은 거대한 능력자이기 전에 인격적인 분이십니다. 배신당하고 상처받으시는 하나님을 묵상하십시오. 나는 오늘 하나님께 어떤 마음을 드리고 있습니까?</div>
+    <div class="day-verse">사 1:2 — "내가 자식을 양육하였거늘 그들이 나를 거역하였도다"</div>
+    <button class="tts-btn" onclick="speak(this, 'thu')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="day-card">
+    <div class="day-label">금요일</div>
+    <div class="day-theme">옥토를 묵히지 말라</div>
+    <div class="day-content">내 삶에서 지금 열매 맺고 있는 영역은 어디입니까? 반대로 묵혀두고 있는 옥토는 어디입니까? 한 가지를 구체적으로 적고 기도하십시오.</div>
+    <div class="day-verse">막 4:20 — "30배, 60배, 100배의 결실을 맺느니라"</div>
+    <button class="tts-btn" onclick="speak(this, 'fri')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="day-card">
+    <div class="day-label">토요일</div>
+    <div class="day-theme">부담이 아닌 기쁨으로</div>
+    <div class="day-content">신앙의 열심이 짐으로 느껴집니까? 서울대 합격생의 비유를 생각하십시오. 은혜를 받은 자의 열심은 감사에서 나옵니다.</div>
+    <div class="day-verse">빌 4:4 — "주 안에서 항상 기뻐하라"</div>
+    <button class="tts-btn" onclick="speak(this, 'sat')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+  <div class="day-card">
+    <div class="day-label">주일 준비</div>
+    <div class="day-theme">이 한 주를 돌아보며</div>
+    <div class="day-content">버려진 상태에서 불린 은혜 — 이번 주 이것이 실제로 느껴졌습니까? 그 감격을 담아 예배를 준비하십시오.</div>
+    <div class="day-verse">히 2:3 — "이같이 큰 구원을 등한히 여기면"</div>
+    <button class="tts-btn" onclick="speak(this, 'sun')"><span class="icon">🔊</span> 듣기</button>
+  </div>
+
+</div>
+
+<!-- 소그룹 나눔 -->
+<div class="panel" id="sharing">
+
+  <div class="question-intro">
+    <div class="question-intro-top">나눔의 중심 질문</div>
+    <div class="question-intro-text">
+      우리는 심판받아 버려진 세상 한복판에서<br>
+      조건 없이 은혜로 옥토가 되었습니다.<br>
+      이 사실 앞에서, 우리는 어떻게 살아야 할까요?
+    </div>
+  </div>
+
+  <div class="question-card red">
+    <div class="q-number">1</div>
+    <div class="q-text">"좋은 밭이 되어 열매를 맺으라"는 설교를 들어보셨습니까? 오늘 말씀을 듣고 난 후 그 차이가 어떻게 느껴집니까?</div>
+    <div class="q-guide">나눔 방향 → 반쪽 진리가 복음을 어떻게 왜곡하는지 함께 직면하도록. 정죄가 아니라 발견의 기쁨으로 나누십시오.</div>
+  </div>
+
+  <div class="question-card red">
+    <div class="q-number">2</div>
+    <div class="q-text">복음을 들어도 믿지 않는 사람들을 봅니다. 오늘 말씀대로라면 그 사람들과 나 사이의 차이는 무엇입니까?</div>
+    <div class="q-guide">나눔 방향 → 내가 더 나은 사람이어서가 아님을 직면하게 합니다. 교만이 무너지고 감사가 나오는 방향으로.</div>
+  </div>
+
+  <div class="question-card gold">
+    <div class="q-number">3</div>
+    <div class="q-text">내가 믿게 된 것이 나의 결단이나 노력 때문이 아니라는 사실이 오늘 얼마나 실감됩니까? 나의 회심 이야기를 나눠봅시다.</div>
+    <div class="q-guide">나눔 방향 → 각자의 회심 이야기 안에서 하나님의 선제적 은혜를 발견하도록 이끌어 주십시오.</div>
+  </div>
+
+  <div class="question-card gold">
+    <div class="q-number">4</div>
+    <div class="q-text">이 은혜를 받은 사람으로서, 내 삶의 어느 영역에서 옥토를 묵히고 있습니까? 이번 주 한 가지 구체적인 실천을 나눠봅시다.</div>
+    <div class="q-guide">나눔 방향 → 부담이나 율법이 아니라, 은혜에 대한 자연스러운 응답으로 실천이 나오도록 합니다.</div>
+  </div>
+
+  <div class="q-prayer">
+    <div class="q-prayer-label">함께 기도하며 마칩니다</div>
+    <div class="q-prayer-text">
+      버려진 상태에서 불러주신 은혜에 감사하며,<br>
+      각자의 옥토에서 열매 맺는 한 주가 되도록<br>
+      함께 기도합니다.
+    </div>
+  </div>
+
+</div>
+
+<div id="nowPlaying" class="now-playing">🔊 재생 중...</div>
+
+<div class="footer">마가복음 4:1–9 · 들을 귀 있는 자</div>
+
+<script>
+// MP3 재생 엔진
+let _audio = null;
+
+function stopAudio() {
+  if (_audio) {
+    _audio.pause();
+    _audio.currentTime = 0;
+    _audio = null;
+  }
+}
+
+function speak(btn, key) {
+  // 같은 버튼 다시 누르면 정지
+  if (btn.classList.contains('playing')) {
+    stopAudio();
+    btn.classList.remove('playing');
+    btn.querySelector('.icon').textContent = '🔊';
+    return;
+  }
+  // 다른 버튼 정지
+  document.querySelectorAll('.tts-btn.playing').forEach(b => {
+    b.classList.remove('playing');
+    b.querySelector('.icon').textContent = '🔊';
+  });
+  stopAudio();
+
+  _audio = new Audio('audio/' + key + '.mp3');
+  btn.classList.add('playing');
+  btn.querySelector('.icon').textContent = '⏹';
+
+  _audio.onended = () => {
+    btn.classList.remove('playing');
+    btn.querySelector('.icon').textContent = '🔊';
+    _audio = null;
+  };
+  _audio.onerror = () => {
+    btn.classList.remove('playing');
+    btn.querySelector('.icon').textContent = '🔊';
+    _audio = null;
+  };
+  _audio.play().catch(() => {
+    btn.classList.remove('playing');
+    btn.querySelector('.icon').textContent = '🔊';
+  });
+}
+
+function showTab(name, el) {
+  stopAll();
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
