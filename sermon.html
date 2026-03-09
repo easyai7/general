@@ -1,7 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="설교묵상">
+  <meta name="theme-color" content="#c8a84b">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>설교 복습 | 들을 귀 있는 자</title>
 <style>
@@ -368,16 +375,29 @@
 <div class="footer">마가복음 4:1–9 · 들을 귀 있는 자</div>
 
 <script>
-// MP3 재생 엔진
+// MP3 재생 (GitHub Pages) / TTS 폴백 (로컬)
 let _audio = null;
 
 function stopAudio() {
-  if (_audio) {
-    _audio.pause();
-    _audio.currentTime = 0;
-    _audio = null;
-  }
+  if (_audio) { _audio.pause(); _audio.currentTime = 0; _audio = null; }
+  window.speechSynthesis && window.speechSynthesis.cancel();
 }
+
+const ttsTexts = {
+  misread: `이 본문에 대한 흔한 오해입니다. 씨 뿌리는 비유를 설교할 때 많은 분들이 "마음의 돌을 제거하고 좋은 밭이 되어 열매를 맺으라"고 설교합니다. 은혜가 되는 말씀이고 틀린 말도 아닙니다. 그러나 바로 이 점이 더 위험합니다. 반쪽 진리는 전체 진리보다 더 교묘하게 복음을 왜곡할 수 있습니다. 이렇게 설교하면 결실하지 못한 책임이 인간에게 있고, 구원의 무게 중심이 슬그머니 인간의 노력으로 넘어가게 됩니다. 복음의 역설이 자기계발 이야기로 바뀌어버리는 것입니다.`,
+  key: `이 비유를 해석하는 결정적인 열쇠는 마가복음 4장 11절과 12절입니다. 제자들이 예수님께 "왜 그들에게는 비유로만 말씀하십니까?" 하고 물었을 때, 예수님은 놀라운 대답을 하셨습니다. 하나님 나라의 비밀을 너희에게는 주었으나 외인에게는 모든 것을 비유로 한다고 하셨습니다. 그 이유는 그들이 보아도 알지 못하고 들어도 깨닫지 못하게 하려 함이라고 하셨습니다. 마태복음 13장에서는 더 노골적으로 그들이 못 알아듣도록 일부러 그러신다고 하십니다. 이것이 핵심입니다. 길가 밭, 돌밭, 가시밭은 깨달음이 금지된 외인들이고, 옥토는 깨달음이 허락된 제자들입니다. 이 두 절을 빼고 비유를 읽으면 전혀 다른 설교가 만들어집니다.`,
+  isaiah: `예수님께서 왜 그렇게 말씀하셨는지 이해하려면 이사야 6장 9절과 10절의 배경을 알아야 합니다. 이사야 선지자는 처음부터 실패가 예고된 채 보냄받은 선지자였습니다. 네가 가서 전해도 그들이 듣지 않을 것이다, 라고 하나님께서 미리 말씀하셨습니다. 이사야 1장을 보면 하나님의 마음이 잘 드러납니다. 소는 그 임자를 알고 나귀는 그 주인의 구유를 알건마는 이스라엘은 알지 못한다고 하십니다. 자식처럼 기르고 애지중지하였더니 가축만도 못하게 배신한 이스라엘을 향한 하나님의 상한 마음이 터져나오는 것입니다. 사6장 9절의 "행여 깨닫고 돌이킬까 봐 겁난다"는 말씀은 하나님의 본심이 아니라, 끝끝내 배신한 자식을 향한 상한 아버지의 마음이 반어법으로 표현된 것입니다. 하나님은 거대한 능력자이기 이전에, 인간보다 더 섬세한 감정을 가지신 인격적인 분이십니다.`,
+  judgment: `길가 밭, 돌밭, 가시밭은 인간이 노력해서 고칠 수 있는 상태가 아닙니다. 이것은 하나님의 최선을 다한 사랑을 끝끝내 거부하고 배신한 인간들에게 내려진 심판의 결과입니다. 개선의 여지조차 차단된 상태입니다. 로마서 11장을 보면 이스라엘의 완악함으로 인해 구원이 이방인을 향하게 되었다고 말씀합니다. 우리는 마치 참 감람나무에서 접붙임을 받은 돌 감람나무 가지와 같습니다. 원래 하나님의 백성이었던 이스라엘도 아끼지 않으시고 꺾으셨다는 사실을 기억해야 합니다. 전 인류가 이미 심판받아 버려진 상태 — 이 절망적인 사실을 직면하지 않으면 은혜가 반쪽이 됩니다. 얼마나 희망 없는 절망적인 상황이었는지를 알아야, 그 가운데서 조건 없이 불린 은혜의 크기를 알 수 있습니다.`,
+  grace: `이 해석의 직접적인 근거는 마가복음 4장 11절입니다. 예수님께서 직접 말씀하셨습니다. 하나님 나라의 비밀을 너희에게는 주었으나, 외인에게는 모든 것을 비유로 한다고 하셨습니다. 여기서 비유 속 길가 밭, 돌밭, 가시밭은 깨달음이 금지된 외인들이고, 옥토는 깨달음이 허락된 제자들임이 분명하게 드러납니다. 옥토는 인간이 스스로 만드는 것이 아닙니다. 하나님께서 이미 확정하신 상태입니다. 모든 것이 버려진 그 상황에서 하나님 나라의 비밀이 제자들에게만 열렸습니다. 이유가 설명되지 않습니다. 오직 은혜입니다. 오직 하나님의 주권적인 선택입니다. 복음을 들어도 믿지 않는 사람들이 넘치는 이 세상에서, 예수님이 나의 구주로 믿어졌다면 — 그것은 내가 더 좋은 사람이었기 때문이 아닙니다. 하나님께서 먼저 옥토로 준비하셨기 때문입니다. 너희가 옥토가 되어라, 가 아닙니다. 너희는 이미 옥토이니라, 는 말씀입니다.`,
+  conclusion: `예수님의 비유가 말씀하시려는 것은 여기까지입니다. 너희는 하나님의 은혜로 열매 맺는 인생 안에 있다. 이것입니다. 낭비하지 마십시오. 이 소중한 기회를 묵혀 두지 마십시오. 그런데 그 동기가 중요합니다. 돌밭의 돌을 제거해야 한다는 부담이나 두려움이 아니라, 옥토로서의 감사와 기쁨입니다. 서울대학교에 합격한 학생이 공부해야 할 의무감보다 최고의 기회를 얻은 기쁨과 의욕을 느끼는 것처럼, 신앙의 열심도 은혜에 대한 감사에서 나오는 것입니다. 30배, 60배, 100배의 결실 차이는 여러분의 분투에 달려 있습니다. 그것이 천국의 상급으로 이어질 것입니다.`,
+  mon: `월요일 묵상입니다. 주제는 나는 어떤 상태였는가 입니다. 예수를 믿기 전, 혹은 복음을 처음 들었을 때를 생각해 보십시오. 복음이 들려도 깨닫지 못했던 그 시간이 있었습니까? 오늘 말씀대로라면 그것은 의지가 부족해서가 아니었습니다. 보아도 알지 못하고 들어도 깨닫지 못하도록 막혀 있던 심판의 상태였습니다. 그 절망의 깊이가 실감될수록 나를 그 상태에서 불러내신 은혜의 무게도 달라집니다. 이사야 6장 9절 — 듣기는 들어도 깨닫지 못할 것이요.`,
+  tue: `화요일 묵상입니다. 주제는 전 인류가 버려진 상태다 입니다. 주변을 돌아보십시오. 복음을 들어도 믿지 않는 가족, 친구, 이웃이 있습니까? 오늘 말씀대로라면 그들의 불신은 단순히 그들의 완고함만이 아닙니다. 하나님의 최선을 거부한 인류에게 내려진 심판의 결과로, 들어도 깨닫지 못하는 상태에 있는 것입니다. 이 사실이 전도에 대한 나의 자세를 어떻게 바꿉니까? 더 절박하게 기도하게 됩니까? 로마서 11장 32절 — 하나님이 모든 사람을 순종하지 아니하는 가운데 가두어 두심은 모든 사람에게 긍휼을 베풀려 하심이라.`,
+  wed: `수요일 묵상입니다. 주제는 조건 없이 불리었다 입니다. 내가 예수를 믿게 된 이유를 설명할 수 있습니까? 내가 더 선한 사람이었기 때문입니까? 더 지혜로웠기 때문입니까? 마가복음 4장 11절은 이유를 설명하지 않습니다. 그냥 하나님 나라의 비밀을 너희에게는 주었다고 하십니다. 설명 없는 은혜입니다. 조건 없는 부르심입니다. 이 사실 앞에 오늘 조용히 무릎을 꿇으십시오. 내가 옥토가 된 것은 내 공로가 없습니다. 오직 하나님의 은혜입니다.`,
+  thu: `목요일 묵상입니다. 주제는 배신당하신 하나님 입니다. 우리는 하나님을 거대한 능력자로만 생각하기 쉽습니다. 그러나 성경은 하나님을 인간보다 더 섬세한 감정을 가지신 인격적인 분으로 말씀합니다. 이사야 1장에서 하나님은 자식처럼 기른 이스라엘이 가축만도 못하게 배신했다며 탄식하십니다. 아가서에서는 배신한 이스라엘에게 사랑을 구걸하는 연인의 모습으로 묘사되기도 합니다. 나는 하나님과 어떤 관계 속에 있습니까? 오늘 내가 하나님께 드리는 마음은 어떤 마음입니까? 이사야 1장 2절 — 내가 자식을 양육하였거늘 그들이 나를 거역하였도다.`,
+  fri: `금요일 묵상입니다. 주제는 옥토를 묵히지 말라 입니다. 하나님께서 나를 옥토로 준비하셨습니다. 심판받아 버려진 세상 한복판에서 열매 맺는 인생으로 불러주셨습니다. 그렇다면 내 삶을 돌아보십시오. 지금 열매 맺고 있는 영역이 있습니까? 성경 읽기, 기도, 전도, 봉사, 가정에서의 신앙 — 어느 영역에서 결실이 있습니까? 반대로 묵혀두고 있는 옥토는 어디입니까? 오늘 한 가지를 구체적으로 적고 기도하십시오. 마가복음 4장 20절 — 좋은 땅에 뿌려졌다는 것은 말씀을 듣고 받아 30배, 60배, 100배의 결실을 맺는 자니라.`,
+  sat: `토요일 묵상입니다. 주제는 부담이 아닌 기쁨으로 입니다. 신앙생활이 짐처럼 느껴질 때가 있습니까? 해야 할 것들이 너무 많은 것 같고, 잘 못하고 있는 것 같은 부담감이 있습니까? 설교 말씀의 예화를 생각해 보십시오. 서울대학교에 합격한 학생은 공부해야 한다는 의무감보다 최고의 기회를 얻었다는 자부심과 기쁨이 더 클 것입니다. 신앙생활도 마찬가지입니다. 옥토가 되어야 한다는 부담이 아니라, 이미 옥토가 된 자로서 열매 맺는 기쁨입니다. 그 동기가 바뀔 때 신앙의 분발도 달라집니다. 빌립보서 4장 4절 — 주 안에서 항상 기뻐하라.`,
+  sun: `주일 준비 묵상입니다. 이번 한 주를 돌아보십시오. 버려진 상태에서 불린 은혜 — 이 사실이 이번 주에 실제로 느껴진 순간이 있었습니까? 묵상이 머리에만 머물지 않고 마음에 닿았습니까? 히브리서 2장 3절은 말씀합니다. 이같이 큰 구원을 등한히 여기면 어찌 그 보응을 피하리요. 이번 주 말씀을 통해 은혜가 더 선명해진 것을 감사하며, 그 감격을 담아 오늘 예배를 준비하십시오.`
+};
 
 function speak(btn, key) {
   // 같은 버튼 다시 누르면 정지
@@ -394,33 +414,41 @@ function speak(btn, key) {
   });
   stopAudio();
 
-  _audio = new Audio('audio/' + key + '.mp3');
-  btn.classList.add('playing');
-  btn.querySelector('.icon').textContent = '⏹';
+  // GitHub Pages면 MP3, 로컬이면 TTS
+  const isLocal = location.protocol === 'file:';
 
-  _audio.onended = () => {
-    btn.classList.remove('playing');
-    btn.querySelector('.icon').textContent = '🔊';
-    _audio = null;
-  };
-  _audio.onerror = () => {
-    btn.classList.remove('playing');
-    btn.querySelector('.icon').textContent = '🔊';
-    _audio = null;
-  };
-  _audio.play().catch(() => {
-    btn.classList.remove('playing');
-    btn.querySelector('.icon').textContent = '🔊';
-  });
+  if (!isLocal) {
+    _audio = new Audio('audio/' + key + '.mp3');
+    btn.classList.add('playing');
+    btn.querySelector('.icon').textContent = '⏹';
+    _audio.onended = () => { btn.classList.remove('playing'); btn.querySelector('.icon').textContent = '🔊'; _audio = null; };
+    _audio.onerror = () => { btn.classList.remove('playing'); btn.querySelector('.icon').textContent = '🔊'; _audio = null; };
+    _audio.play().catch(() => { btn.classList.remove('playing'); btn.querySelector('.icon').textContent = '🔊'; });
+  } else {
+    // 로컬 TTS 폴백
+    const text = ttsTexts[key];
+    if (!text || !window.speechSynthesis) return;
+    const sentences = text.match(/[^.!?。]+[.!?。]*/g) || [text];
+    let i = 0;
+    btn.classList.add('playing');
+    btn.querySelector('.icon').textContent = '⏹';
+    function next() {
+      if (i >= sentences.length || !btn.classList.contains('playing')) {
+        btn.classList.remove('playing');
+        btn.querySelector('.icon').textContent = '🔊';
+        return;
+      }
+      const u = new SpeechSynthesisUtterance(sentences[i++].trim());
+      u.lang = 'ko-KR'; u.rate = 0.95;
+      u.onend = next;
+      window.speechSynthesis.speak(u);
+    }
+    next();
+  }
 }
 
-function showTab(name, el) {
-  stopAll();
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(name).classList.add('active');
-  el.classList.add('active');
-}
+window.speechSynthesis && (window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); });
+
 </script>
 </body>
 </html>
