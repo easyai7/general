@@ -375,6 +375,15 @@
 <div class="footer">마가복음 4:1–9 · 들을 귀 있는 자</div>
 
 <script>
+// 탭 전환
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  stopAudio();
+}
+
 // MP3 재생 (GitHub Pages) / TTS 폴백 (로컬)
 let _audio = null;
 
