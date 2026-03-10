@@ -404,13 +404,13 @@ function speak(btn, key) {
   if (btn.classList.contains('playing')) {
     stopAudio();
     btn.classList.remove('playing');
-    btn.querySelector('.icon').textContent = '🔊';
+    btn.innerHTML = '<span class="icon">🔊</span> 듣기';
     return;
   }
   // 다른 버튼 정지
   document.querySelectorAll('.tts-btn.playing').forEach(b => {
     b.classList.remove('playing');
-    b.querySelector('.icon').textContent = '🔊';
+    b.innerHTML = '<span class="icon">🔊</span> 듣기';
   });
   stopAudio();
 
@@ -420,10 +420,10 @@ function speak(btn, key) {
   if (!isLocal) {
     _audio = new Audio('audio/' + key + '.mp3');
     btn.classList.add('playing');
-    btn.querySelector('.icon').textContent = '⏹';
-    _audio.onended = () => { btn.classList.remove('playing'); btn.querySelector('.icon').textContent = '🔊'; _audio = null; };
-    _audio.onerror = () => { btn.classList.remove('playing'); btn.querySelector('.icon').textContent = '🔊'; _audio = null; };
-    _audio.play().catch(() => { btn.classList.remove('playing'); btn.querySelector('.icon').textContent = '🔊'; });
+    btn.innerHTML = '<span class="icon">⏹</span> 멈춤';
+    _audio.onended = () => { btn.classList.remove('playing'); btn.innerHTML = '<span class="icon">🔊</span> 듣기'; _audio = null; };
+    _audio.onerror = () => { btn.classList.remove('playing'); btn.innerHTML = '<span class="icon">🔊</span> 듣기'; _audio = null; };
+    _audio.play().catch(() => { btn.classList.remove('playing'); btn.innerHTML = '<span class="icon">🔊</span> 듣기'; });
   } else {
     // 로컬 TTS 폴백
     const text = ttsTexts[key];
@@ -431,11 +431,11 @@ function speak(btn, key) {
     const sentences = text.match(/[^.!?。]+[.!?。]*/g) || [text];
     let i = 0;
     btn.classList.add('playing');
-    btn.querySelector('.icon').textContent = '⏹';
+    btn.innerHTML = '<span class="icon">⏹</span> 멈춤';
     function next() {
       if (i >= sentences.length || !btn.classList.contains('playing')) {
         btn.classList.remove('playing');
-        btn.querySelector('.icon').textContent = '🔊';
+        btn.innerHTML = '<span class="icon">🔊</span> 듣기';
         return;
       }
       const u = new SpeechSynthesisUtterance(sentences[i++].trim());
