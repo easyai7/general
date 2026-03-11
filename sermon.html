@@ -185,6 +185,43 @@
 </head>
 <body>
 
+<div id="inapp-banner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999;
+  background:#e53935; padding:16px 18px; box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  flex-direction:column; gap:10px;">
+  <div style="color:#fff; font-size:17px; font-weight:900; line-height:1.5;">
+    ⚠️ 지금 앱 내 브라우저로 열려 있습니다！<br>
+    <span style="font-size:17px; font-weight:600;">음성을 제대로 재생하려면 Chrome으로 열어야 합니다。</span>
+  </div>
+  <button id="open-chrome-btn" style="
+    background:#fff; color:#e53935; border:none; border-radius:12px;
+    padding:14px; font-size:17px; font-weight:900; cursor:pointer; width:100%;">
+    🌐 Chrome으로 열기
+  </button>
+</div>
+<div id="inapp-spacer" style="display:none; height:120px;"></div>
+
+<script>
+(function() {
+  var ua = navigator.userAgent;
+  var isInAppBrowser = /KAKAOTALK|NAVER|FB_IAB|Instagram|Line/i.test(ua);
+  if (isInAppBrowser) {
+    var banner = document.getElementById('inapp-banner');
+    var spacer = document.getElementById('inapp-spacer');
+    var btn    = document.getElementById('open-chrome-btn');
+    var pageUrl = 'https://easyai7.github.io/general/sermon.html';
+    banner.style.display = 'flex';
+    spacer.style.display = 'block';
+    btn.addEventListener('click', function() {
+      var encoded = encodeURIComponent(pageUrl);
+      var intentUrl = 'intent://' + pageUrl.replace(/^https?:\/\//, '') +
+        '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encoded + ';end';
+      location.href = intentUrl;
+      setTimeout(function() { window.close(); }, 2500);
+    });
+  }
+})();
+</script>
+
 <div class="header">
   <div class="header-label">설교 복습</div>
   <div class="header-title">들을 귀 있는 자</div>
