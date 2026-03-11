@@ -1,15 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설교묵상 앱 — 성도 안내</title>
 <meta property="og:title" content="설교묵상 앱 설치 안내">
 <meta property="og:description" content="홈 화면에 추가하면 앱처럼 사용할 수 있습니다">
-<meta property="og:image" content="https://easyai7.github.io/general/icon-192.png">
+<meta property="og:image" content="https://easyai7.github.io/general/icon-192.png?v=2">
 <meta property="og:url" content="https://easyai7.github.io/general/ScriptMed.html">
 <meta property="og:type" content="website">
-<title>설교묵상 앱 — 성도 안내</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -338,11 +337,15 @@ body{
     ⚠️ 크롬이 아닌 브라우저로 열려 있습니다！<br>
     <span style="font-size:17px; font-weight:600;">음성 재생과 홈화면 설치를 위해 Chrome으로 열어주세요。</span>
   </div>
-  <a id="open-chrome-btn" href="intent://easyai7.github.io/general/ScriptMed.html#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=https%3A%2F%2Feasyai7.github.io%2Fgeneral%2FScriptMed.html;end" style="display:block;background:#fff;color:#e53935;border:none;border-radius:12px;padding:14px;font-size:17px;font-weight:900;cursor:pointer;width:100%;text-align:center;text-decoration:none;box-sizing:border-box;">
+  <button id="open-chrome-btn" style="
+    background:#fff; color:#e53935; border:none; border-radius:12px;
+    padding:14px; font-size:17px; font-weight:900; cursor:pointer; width:100%;">
     🌐 Chrome으로 열기
-  </a>
+  </button>
 </div>
 <div id="inapp-spacer" style="display:none; height:120px;"></div>
+
+<a class="go-btn" href="intent://easyai7.github.io/general/sermon.html#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=https%3A%2F%2Feasyai7.github.io%2Fgeneral%2Fsermon.html;end" style="margin:16px 16px 0;">📖 설교묵상 앱 바로 열기</a>
 
 <script>
 (function() {
@@ -397,7 +400,7 @@ body{
   <div class="chrome-note">
     <span style="font-size:40px;">🌐</span>
     <div class="chrome-note-text">
-      음성 재생과 홈 화면 설치를 위해<br><strong>크롬(Chrome) 브라우저</strong>가 꼭 필요합니다.<br>카카오톡 등에서 열면 위에 <strong>크롬으로 열기</strong> 버튼이 뜹니다.
+      <strong>크롬(Chrome) 브라우저</strong>를 사용해야<br>음성 듣기 기능이 정상 작동합니다
     </div>
   </div>
   <div class="x-browsers">
@@ -406,11 +409,131 @@ body{
     <div class="x-br"><span>🦊</span><span>Firefox</span></div>
   </div>
 
-
-
   <!-- STEP 1 -->
   <div class="card">
     <div class="step-badge">1</div>
+    <div class="card-title">📋 주소를 복사하세요</div>
+    <div class="card-desc">아래 버튼을 누르면 앱 주소가 자동으로 복사됩니다.</div>
+    <div class="url-box">https://easyai7.github.io/general/sermon.html</div>
+    <button class="copy-btn" onclick="copyUrl(this)">📋 주소 복사하기</button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="card">
+    <div class="step-badge">2</div>
+    <div class="card-title">🌐 크롬을 열고 주소 붙여넣기</div>
+
+    <div class="substep-wrap">
+      <div class="substep-label">① 크롬 위쪽 주소창을 찾으세요</div>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen" style="min-height:200px;">
+            <div class="chrome-bar">
+              <span class="chrome-back">‹</span>
+              <div class="chrome-addr">검색 또는 URL 입력</div>
+              <span class="chrome-dots">⋮</span>
+            </div>
+            <div style="font-size:12px;color:#aaa;text-align:center;padding-top:32px;">새 탭</div>
+            <span class="cursor cur-addr">👆</span>
+          </div>
+        </div>
+      </div>
+      <div class="substep-tip">👆 화면 위쪽 가운데 긴 흰 칸이 주소창입니다</div>
+    </div>
+
+    <div class="substep-wrap">
+      <div class="substep-label">② 주소창을 <strong>길게 누르세요</strong> (1~2초)</div>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen" style="min-height:210px;">
+            <div class="chrome-bar">
+              <span class="chrome-back">‹</span>
+              <div class="chrome-addr" style="background:#e8f0fe;">검색 또는 URL 입력</div>
+              <span class="chrome-dots">⋮</span>
+            </div>
+            <div class="paste-pop">
+              <div class="paste-item hi">📋 붙여넣기</div>
+              <div class="paste-item">전체 선택</div>
+            </div>
+            <div style="font-size:12px;color:#aaa;text-align:center;padding-top:20px;">새 탭</div>
+            <span class="cursor" style="top:5px;left:65px;animation:tapAddr 3s ease infinite;">👆</span>
+          </div>
+        </div>
+      </div>
+      <div class="substep-tip">꾹 누르면 <strong>"붙여넣기"</strong> 메뉴가 나타납니다</div>
+    </div>
+
+    <div class="substep-wrap">
+      <div class="substep-label">③ <strong>"붙여넣기"</strong>를 터치하세요</div>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen" style="min-height:210px;">
+            <div class="chrome-bar">
+              <span class="chrome-back">‹</span>
+              <div class="chrome-addr on">easyai7.github.io/general/sermon.html</div>
+              <span class="chrome-dots">⋮</span>
+            </div>
+            <div class="paste-pop" style="animation:ppIn 0s forwards;">
+              <div class="paste-item hi">📋 붙여넣기</div>
+              <div class="paste-item">전체 선택</div>
+            </div>
+            <div style="font-size:12px;color:#aaa;text-align:center;padding-top:20px;">새 탭</div>
+            <span class="cursor cur-paste">👆</span>
+          </div>
+        </div>
+      </div>
+      <div class="substep-tip">터치하면 주소창에 주소가 입력됩니다</div>
+    </div>
+
+    <div class="substep-wrap">
+      <div class="substep-label">④ 키보드의 <strong>"이동"</strong> 버튼을 누르세요</div>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen" style="min-height:290px;">
+            <div class="chrome-bar">
+              <span class="chrome-back">‹</span>
+              <div class="chrome-addr on">easyai7.github.io/general/sermon.html</div>
+              <span class="chrome-dots">⋮</span>
+            </div>
+            <div style="font-size:12px;color:#aaa;text-align:center;padding:14px 0 6px;">페이지 이동 중...</div>
+            <div class="kb">
+              <div class="kb-row">
+                <div class="kb-key">ㅂ</div><div class="kb-key">ㅈ</div><div class="kb-key">ㄷ</div>
+                <div class="kb-key">ㄱ</div><div class="kb-key">ㅅ</div><div class="kb-key">ㅛ</div>
+                <div class="kb-key">ㅕ</div><div class="kb-key">ㅑ</div><div class="kb-key">ㅐ</div>
+              </div>
+              <div class="kb-row">
+                <div class="kb-key">ㅁ</div><div class="kb-key">ㄴ</div><div class="kb-key">ㅇ</div>
+                <div class="kb-key">ㄹ</div><div class="kb-key">ㅎ</div><div class="kb-key">ㅗ</div>
+                <div class="kb-key">ㅓ</div><div class="kb-key">ㅏ</div><div class="kb-key">ㅣ</div>
+              </div>
+              <div class="kb-row">
+                <div class="kb-key kb-wide">⇧</div>
+                <div class="kb-key">ㅋ</div><div class="kb-key">ㅌ</div><div class="kb-key">ㅊ</div>
+                <div class="kb-key">ㅍ</div><div class="kb-key">ㅠ</div><div class="kb-key">ㅜ</div>
+                <div class="kb-key kb-wide">⌫</div>
+              </div>
+              <div class="kb-row">
+                <div class="kb-key kb-wide">!#1</div>
+                <div class="kb-key kb-space">스페이스</div>
+                <div class="kb-go">이동</div>
+              </div>
+            </div>
+            <span class="cursor cur-go">👆</span>
+          </div>
+        </div>
+      </div>
+      <div class="substep-tip">오른쪽 아래 <strong style="color:var(--blue);">"이동"</strong>을 누르면 앱이 열립니다!</div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="card">
+    <div class="step-badge">3</div>
     <div class="card-title">⋮ 오른쪽 위 점 세 개 버튼</div>
     <div class="card-desc" style="margin-bottom:4px;">크롬 오른쪽 상단 <strong>⋮ 버튼</strong>을 누른 뒤 <strong>"홈 화면에 추가"</strong>를 선택하세요.</div>
     <div class="phone-wrap">
@@ -441,17 +564,17 @@ body{
               <div class="dd-item hi">🏠 홈 화면에 추가</div>
               <div class="dd-item">공유</div>
             </div>
-            <span class="cursor cur-dots" style="font-size:40px;">👆</span>
-            <span class="cursor cur-menu" style="font-size:40px;">👆</span>
+            <span class="cursor cur-dots">👆</span>
+            <span class="cursor cur-menu">👆</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- STEP 2 -->
+  <!-- STEP 4 -->
   <div class="card">
-    <div class="step-badge">2</div>
+    <div class="step-badge">4</div>
     <div class="card-title">✅ 홈 화면에 아이콘 등장!</div>
     <div class="card-desc">추가하면 홈 화면에 아이콘이 생깁니다. 다음부터는 아이콘을 눌러 바로 시작하세요.</div>
     <div class="phone-wrap">
@@ -487,7 +610,7 @@ body{
     </div>
   </div>
 
-  <a class="go-btn" href="intent://easyai7.github.io/general/sermon.html#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=https%3A%2F%2Feasyai7.github.io%2Fgeneral%2Fsermon.html;end">📖 설교묵상 앱 바로 열기</a>
+  <a class="go-btn" href="intent://easyai7.github.io/general/ScriptMed.html#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=https%3A%2F%2Feasyai7.github.io%2Fgeneral%2FScriptMed.html;end" style="background:linear-gradient(135deg,#c62828,#e53935);">🌐 크롬으로 열고 설치하기</a>
 
 </div>
 
@@ -496,28 +619,20 @@ body{
 </div>
 
 <script>
-(function() {
-  var ua = navigator.userAgent;
-  var pageUrl = window.location.href;
-  var isInApp = /KAKAOTALK|NAVER|FB_IAB|FBAN|Instagram|Line|Snapchat/i.test(ua);
-  var isChrome = /Chrome\//.test(ua) && !/SamsungBrowser/i.test(ua) && !/EdgA/i.test(ua) && !/OPR/i.test(ua);
-  var isNotChrome = !isChrome;
-  function openInChrome() {
-    var encoded = encodeURIComponent(pageUrl);
-    var intentUrl = 'intent://' + pageUrl.replace(/^https?:\/\//, '') +
-      '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encoded + ';end';
-    location.href = intentUrl;
-    setTimeout(function() { location.href = pageUrl; }, 2500);
-  }
-  var banner = document.getElementById('inapp-banner');
-  var spacer = document.getElementById('inapp-spacer');
-  var bannerBtn = document.getElementById('open-chrome-btn');
-  if ((isInApp || isNotChrome) && banner) {
-    banner.style.display = 'flex';
-    if(spacer) spacer.style.display = 'block';
-    if(bannerBtn) bannerBtn.addEventListener('click', openInChrome);
-  }
-})();
+function copyUrl(btn) {
+  navigator.clipboard.writeText('https://easyai7.github.io/general/sermon.html')
+    .then(function() {
+      btn.textContent = '✅ 복사됐어요! 크롬을 여세요';
+      btn.classList.add('done');
+      setTimeout(function() {
+        btn.textContent = '📋 주소 복사하기';
+        btn.classList.remove('done');
+      }, 4000);
+    })
+    .catch(function() {
+      btn.textContent = '⚠ 위 주소를 직접 복사해 주세요';
+    });
+}
 </script>
 </body>
 </html>
