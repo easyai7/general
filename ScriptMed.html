@@ -345,7 +345,7 @@ body{
 </div>
 <div id="inapp-spacer" style="display:none; height:120px;"></div>
 
-<a class="go-btn" href="intent://easyai7.github.io/general/sermon.html#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=https%3A%2F%2Feasyai7.github.io%2Fgeneral%2Fsermon.html;end" style="margin:16px 16px 0;">📖 설교묵상 앱 바로 열기</a>
+
 
 <script>
 (function() {
@@ -361,13 +361,19 @@ body{
     location.href = intentUrl;
     setTimeout(function() { location.href = pageUrl; }, 2500);
   }
-  var banner = document.getElementById('inapp-banner');
-  var spacer = document.getElementById('inapp-spacer');
-  var btn    = document.getElementById('open-chrome-btn');
+  var banner    = document.getElementById('inapp-banner');
+  var spacer    = document.getElementById('inapp-spacer');
+  var btn       = document.getElementById('open-chrome-btn');
+  var quickWrap = document.getElementById('quick-open-wrap');
+
   if ((isInApp || isNotChrome) && banner) {
+    // 크롬 아닌 경우: 상단 빨간 배너 표시
     banner.style.display = 'flex';
     if(spacer) spacer.style.display = 'block';
     if(btn) btn.addEventListener('click', openInChrome);
+  } else if (isChrome && quickWrap) {
+    // 크롬인 경우: 재방문자용 바로열기 버튼 표시
+    quickWrap.style.display = 'block';
   }
 })();
 </script>
@@ -385,6 +391,14 @@ body{
   </div>
   <div class="hero-sig">— 여러분을 말씀으로 섬기는 담임목사 드림</div>
   <div class="hero-rule"></div>
+</div>
+
+<!-- 재방문자용 바로열기: 크롬에서만 표시 -->
+<div id="quick-open-wrap" style="display:none; padding:16px 16px 0;">
+  <a id="quick-open-btn" class="go-btn" href="https://easyai7.github.io/general/sermon.html"
+     style="background:linear-gradient(135deg,#1E5C2E,#2E8B57);">
+    ✅ 이미 읽으셨나요? 앱 바로 열기
+  </a>
 </div>
 
 <div class="wrap">
