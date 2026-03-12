@@ -286,7 +286,7 @@ body {
     <strong>오디오의 원활한 재생을 위해<br>크롬(Chrome)을 사용해야 합니다.</strong><br>
     홈화면 추가를 못 하셨다면 아래 버튼을 누르세요.
   </div>
-  <a href="intent://easyai7.github.io/general/sermon.html#Intent;scheme=https;package=com.android.chrome;end" id="top-open-btn" class="top-open-btn">📖 크롬으로 바로열기</a>
+  <a href="intent://easyai7.github.io/general/sermon.html#Intent;scheme=https;package=com.android.chrome;end" id="top-open-btn" class="top-open-btn">📖 재사용자 바로열기</a>
 </div>
 
 <!-- HERO -->
@@ -419,6 +419,19 @@ function openInChrome() {
       }
     });
   });
+})();
+</script>
+
+<script>
+(function() {
+  function maxVolume() {
+    document.querySelectorAll('audio, video').forEach(function(el) {
+      el.volume = 1.0;
+    });
+  }
+  window.addEventListener('load', maxVolume);
+  var observer = new MutationObserver(maxVolume);
+  observer.observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 </body>
