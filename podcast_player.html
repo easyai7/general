@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>하나님의 침묵을 해석해 보다</title>
+<meta property="og:title" content="하나님의 침묵을 해석해 보다">
+<meta property="og:description" content="창세기 강해 묵상 팟캐스트">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://easyai7.github.io/general/podcast_player.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://easyai7.github.io/general/podcast_player.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+:root{
+  --bg:      #f0f4f8;
+  --bg2:     #ffffff;
+  --border:  #dde4ed;
+  --accent:  #5b8dd9;
+  --accent2: #7ba7e8;
+  --text:    #1e2a3a;
+  --text2:   #4a5a6a;
+  --text3:   #8a9aaa;
+  --playing: #3a6abf;
+  --passed:  #c0ccd8;
+  --shadow:  rgba(60,90,140,0.10);
+}
+
+html,body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:17px;
+  line-height:1.7;
+}
+
+.wrap{
+  max-width:480px;
+  margin:0 auto;
+  padding:36px 20px 60px;
+}
+
+/* ── 헤더 ── */
+.hdr{
+  text-align:center;
+  margin-bottom:28px;
+}
+.hdr-label{
+  display:inline-block;
+  font-size:12px;
+  letter-spacing:3px;
+  color:var(--accent);
+  background:#e8f0fc;
+  padding:4px 14px;
+  border-radius:20px;
+  margin-bottom:14px;
+}
+.hdr-title{
+  font-size:21px;
+  font-weight:700;
+  color:var(--text);
+  line-height:1.45;
+  margin-bottom:6px;
+}
+.hdr-sub{
+  font-size:14px;
+  color:var(--text3);
+}
+
+/* ── 플레이어 카드 ── */
+.player-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:0 0 20px;
+  box-shadow:0 6px 28px var(--shadow);
+  margin-bottom:20px;
+  overflow:hidden;
+}
+
+/* 커버 */
+.cover{
+  width:100%;
+  aspect-ratio:16/7;
+  background:linear-gradient(135deg, #b8d4f5 0%, #8ab8f0 35%, #6a9de0 65%, #4a7cc8 100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  margin-bottom:0;
+}
+
+/* 배경 원형 장식 */
+.cover::before{
+  content:'';
+  position:absolute;
+  width:180px;height:180px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.12);
+  top:-40px;right:-40px;
+}
+.cover::after{
+  content:'';
+  position:absolute;
+  width:120px;height:120px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.08);
+  bottom:-30px;left:-20px;
+}
+
+.cover-text-wrap{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  padding:0 20px;
+}
+.cover-eyebrow{
+  font-size:11px;
+  letter-spacing:3px;
+  color:rgba(255,255,255,0.75);
+  margin-bottom:8px;
+}
+.cover-main{
+  font-size:18px;
+  font-weight:700;
+  color:#ffffff;
+  line-height:1.4;
+  text-shadow:0 1px 8px rgba(60,90,160,0.25);
+}
+.cover-mic{
+  margin-top:10px;
+  opacity:0.6;
+}
+
+/* 파도 장식 */
+.cover-wave{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:28px;
+}
+
+/* 카드 내부 패딩 */
+.card-inner{
+  padding:18px 20px 0;
+}
+
+.ep-desc{
+  font-size:13px;
+  color:var(--text3);
+  margin-bottom:16px;
+  line-height:1.9;
+}
+
+/* 시크바 */
+.seek-bar{
+  width:100%;
+  height:5px;
+  background:var(--border);
+  border-radius:3px;
+  position:relative;
+  cursor:pointer;
+  margin-bottom:7px;
+}
+.seek-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent2),var(--accent));
+  border-radius:3px;
+  width:0%;
+  pointer-events:none;
+  transition:width .2s linear;
+}
+.seek-thumb{
+  position:absolute;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:14px;height:14px;
+  background:var(--accent);
+  border-radius:50%;
+  left:0%;
+  pointer-events:none;
+  box-shadow:0 1px 6px rgba(91,141,217,.4);
+}
+.time-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--text3);
+  margin-bottom:4px;
+}
+
+/* 컨트롤 */
+.ctrl-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  margin:14px 0 4px;
+}
+.btn-play{
+  width:54px;height:54px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  border:none;
+  border-radius:50%;
+  color:#fff;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(91,141,217,.4);
+  transition:transform .1s, opacity .1s;
+}
+.btn-play:active{transform:scale(.94);opacity:.9}
+
+.btn-rate{
+  background:var(--bg);
+  border:1px solid var(--border);
+  color:var(--text2);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  padding:6px 13px;
+  border-radius:20px;
+  cursor:pointer;
+  min-width:52px;
+  text-align:center;
+  transition:background .15s;
+}
+.btn-rate:active{background:var(--border)}
+
+.btn-skip{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:50%;
+  width:38px;height:38px;
+  color:var(--text2);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+.btn-skip:active{background:var(--border)}
+
+/* ── 스크립트 카드 ── */
+.script-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 2px 12px var(--shadow);
+}
+.script-label{
+  font-size:11px;
+  letter-spacing:2px;
+  color:var(--text3);
+  text-transform:uppercase;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.script-label::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+.script-body{
+  max-height:320px;
+  overflow-y:auto;
+  padding-right:4px;
+}
+.script-body::-webkit-scrollbar{width:3px}
+.script-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.seg{
+  font-size:15px;
+  color:var(--text3);
+  line-height:1.85;
+  margin-bottom:8px;
+  cursor:pointer;
+  padding:7px 10px;
+  border-radius:8px;
+  transition:background .15s,color .15s;
+}
+.seg:hover{background:var(--bg);color:var(--text2)}
+.seg.p-active{
+  color:var(--playing);
+  font-weight:700;
+  background:#e8f0fc;
+}
+.seg.p-passed{color:var(--passed)}
+
+.no-script{
+  text-align:center;
+  padding:30px 0;
+  color:var(--text3);
+  font-size:14px;
+  line-height:1.8;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 플레이어 카드 -->
+  <div class="player-card">
+
+    <!-- 커버 -->
+    <div class="cover">
+      <div class="cover-text-wrap">
+        <div class="cover-eyebrow">PODCAST · 창세기 강해</div>
+        <div class="cover-main">하나님의 침묵을<br>해석해 보다</div>
+        <div class="cover-mic">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="8" y1="22" x2="16" y2="22"/>
+          </svg>
+        </div>
+      </div>
+      <svg class="cover-wave" viewBox="0 0 480 28" preserveAspectRatio="none" fill="white" opacity="0.15">
+        <path d="M0,14 Q80,0 160,14 Q240,28 320,14 Q400,0 480,14 L480,28 L0,28 Z"/>
+      </svg>
+    </div>
+
+    <div class="card-inner">
+      <div class="ep-desc" id="card-desc">대화 형식으로 풀어보는 강해 묵상</div>
+
+      <!-- 시크바 -->
+      <div class="seek-bar" id="seek-bar">
+        <div class="seek-fill" id="seek-fill"></div>
+        <div class="seek-thumb" id="seek-thumb"></div>
+      </div>
+      <div class="time-row">
+        <span id="time-cur">0:00</span>
+        <span id="time-total">0:00</span>
+      </div>
+
+      <!-- 컨트롤 -->
+      <div class="ctrl-row">
+        <button class="btn-rate" id="btn-rate" onclick="cycleRate()">1.0×</button>
+        <button class="btn-skip" onclick="skip(-10)" title="-10초">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.9"/>
+          </svg>
+        </button>
+        <button class="btn-play" id="btn-play" onclick="togglePlay()">
+          <svg id="ico-play" width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
+          <svg id="ico-pause" width="22" height="22" viewBox="0 0 24 24" fill="white" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <button class="btn-skip" onclick="skip(10)" title="+10초">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-.49-3.9"/>
+          </svg>
+        </button>
+        <div style="width:52px"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ★ 여기만 수정하세요
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const CONFIG = {
+  title:  "하나님의 침묵을 해석해 보다",
+  sub:    "팟캐스트",
+  desc:   "자신의 인생이 이해되지 않아서 혼자 몰래 고민하는 이들을 위하여.\n하나님은 우리가 파악하는 범위 밖에 존재하십니다.",
+  mp3:    "https://easyai7.github.io/general/audio/episode.mp3",
+  script: [
+    // 타임코드 예시 — 실제 값으로 교체하세요
+    // {s:0,  e:14, t:"안녕하세요, 창세기 강해 묵상 팟캐스트입니다."},
+    // {s:14, e:32, t:"오늘은 하나님의 침묵이라는 주제로 이야기 나눠보겠습니다."},
+  ]
+};
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+let audio = null;
+let segEls = [];
+let activeIdx = -1;
+const rates = [1.0, 1.2, 1.5, 1.8, 0.8];
+let rateIdx = 0;
+
+function fmt(sec) {
+  if (!isFinite(sec) || sec < 0) sec = 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function init() {
+  document.getElementById('card-desc').innerHTML = CONFIG.desc.replace(/\n/g,'<br>');
+
+  audio = new Audio(CONFIG.mp3);
+  audio.addEventListener('timeupdate', onTime);
+  audio.addEventListener('loadedmetadata', () => {
+    document.getElementById('time-total').textContent = fmt(audio.duration);
+  });
+  audio.addEventListener('ended', () => setPlayIcon(false));
+
+  document.getElementById('seek-bar').addEventListener('click', (e) => {
+    if (!audio.duration) return;
+    const bar = e.currentTarget.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - bar.left) / bar.width));
+    audio.currentTime = pct * audio.duration;
+  });
+}
+
+function buildScript() {
+  const body = document.getElementById('script-body');
+  if (!CONFIG.script || CONFIG.script.length === 0) {
+    body.innerHTML = '<div class="no-script">스크립트가 등록되지 않았습니다.</div>';
+    return;
+  }
+  body.innerHTML = '';
+  segEls = [];
+  CONFIG.script.forEach((seg) => {
+    const el = document.createElement('p');
+    el.className = 'seg';
+    el.textContent = seg.t;
+    el.onclick = () => { audio.currentTime = seg.s; if (audio.paused) togglePlay(); };
+    segEls.push(el);
+    body.appendChild(el);
+  });
+}
+
+function onTime() {
+  const t = audio.currentTime;
+  const dur = audio.duration || 1;
+  const pct = Math.min(100, (t / dur) * 100);
+  document.getElementById('seek-fill').style.width = pct + '%';
+  document.getElementById('seek-thumb').style.left = pct + '%';
+  document.getElementById('time-cur').textContent = fmt(t);
+
+  if (!CONFIG.script || CONFIG.script.length === 0) return;
+  let found = 0;
+  for (let i = 0; i < CONFIG.script.length; i++) {
+    if (CONFIG.script[i].s <= t) found = i; else break;
+  }
+  if (found !== activeIdx) {
+    segEls.forEach((el, i) => {
+      el.classList.remove('p-active','p-passed');
+      if (i < found) el.classList.add('p-passed');
+    });
+    if (segEls[found]) {
+      segEls[found].classList.add('p-active');
+      const rect = segEls[found].getBoundingClientRect();
+      const bdy = document.getElementById('script-body');
+      const bRect = bdy.getBoundingClientRect();
+      if (rect.top < bRect.top || rect.bottom > bRect.bottom) {
+        segEls[found].scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    }
+    activeIdx = found;
+  }
+}
+
+function togglePlay() {
+  if (!audio) return;
+  if (audio.paused) { audio.play(); setPlayIcon(true); }
+  else              { audio.pause(); setPlayIcon(false); }
+}
+
+function setPlayIcon(playing) {
+  document.getElementById('ico-play').style.display  = playing ? 'none'  : 'block';
+  document.getElementById('ico-pause').style.display = playing ? 'block' : 'none';
+}
+
+function skip(sec) {
+  if (!audio) return;
+  audio.currentTime = Math.max(0, Math.min(audio.duration || 0, audio.currentTime + sec));
+}
+
+function cycleRate() {
+  rateIdx = (rateIdx + 1) % rates.length;
+  audio.playbackRate = rates[rateIdx];
+  document.getElementById('btn-rate').textContent = rates[rateIdx].toFixed(1) + '×';
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
