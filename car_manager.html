@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카닥터 — 내 차 주치의</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #e8504a;
+    --accent2: #f5a623;
+    --accent3: #4caf7d;
+    --text: #e8eaf0;
+    --text2: #8b90a8;
+    --text3: #565c7a;
+    --red: #e8504a;
+    --yellow: #f5a623;
+    --green: #4caf7d;
+    --blue: #4a90e2;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+    font-size: 22px;
+  }
+
+  /* ===== HEADER ===== */
+  .app-header {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .app-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .app-logo span { color: var(--text); }
+  .car-info-badge {
+    margin-left: auto;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px; color: var(--text2);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .car-info-badge:hover { border-color: var(--accent); color: var(--text); }
+
+  /* ===== NAV TABS ===== */
+  .nav-tabs {
+    position: fixed; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 100;
+  }
+  .nav-tab {
+    flex: 1; padding: 10px 4px 8px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    cursor: pointer;
+    border: none; background: none;
+    color: var(--text3); font-size: 10px;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: color 0.2s;
+  }
+  .nav-tab .icon { font-size: 22px; }
+  .nav-tab.active { color: var(--accent); }
+  .nav-tab:hover { color: var(--text2); }
+
+  /* ===== PAGE ===== */
+  .page { display: none; padding: 16px 16px 0; }
+  .page.active { display: block; }
+
+  /* ===== SECTION TITLE ===== */
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before {
+    content: '';
+    width: 4px; height: 22px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 20px; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .emoji { font-size: 24px; }
+
+  /* ===== CHECK ITEMS ===== */
+  .check-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 22px; height: 22px; min-width: 22px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .check-item.done .check-box {
+    background: var(--green); border-color: var(--green); color: #fff;
+  }
+  .check-label { flex: 1; }
+  .check-label .name { font-size: 22px; font-weight: 500; color: var(--text); }
+  .check-label .desc { font-size: 18px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+  .check-label .interval { font-size: 16px; color: var(--accent2); margin-top: 4px; }
+  .check-badge {
+    font-size: 14px; padding: 3px 10px; border-radius: 10px;
+    font-weight: 700; white-space: nowrap;
+    align-self: flex-start; margin-top: 2px;
+  }
+  .badge-easy { background: rgba(76,175,125,0.15); color: var(--green); }
+  .badge-mid { background: rgba(245,166,35,0.15); color: var(--yellow); }
+  .badge-hard { background: rgba(232,80,74,0.15); color: var(--red); }
+
+  /* ===== WARNING LIGHTS ===== */
+  .warning-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .warning-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .warning-card:hover { border-color: var(--accent); }
+  .warning-icon { font-size: 28px; margin-bottom: 6px; }
+  .warning-name { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .warning-urgency {
+    font-size: 14px; font-weight: 700;
+    padding: 2px 8px; border-radius: 8px; display: inline-block;
+  }
+  .urgency-red { background: rgba(232,80,74,0.2); color: var(--red); }
+  .urgency-yellow { background: rgba(245,166,35,0.2); color: var(--yellow); }
+  .urgency-green { background: rgba(76,175,125,0.2); color: var(--green); }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none; position: fixed;
+    inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    width: 100%; max-width: 480px;
+    padding: 24px 20px 36px;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .modal-handle {
+    width: 40px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 20px;
+  }
+  .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .modal-close {
+    position: absolute; top: 12px; right: 16px;
+    background: none; border: none; color: var(--text2);
+    font-size: 24px; cursor: pointer;
+  }
+
+  /* ===== RECORD ===== */
+  .record-form { margin-bottom: 16px; }
+  .form-row { margin-bottom: 10px; }
+  .form-label { font-size: 18px; color: var(--text2); margin-bottom: 5px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text); font-size: 20px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent);
+  }
+  .form-select option { background: var(--surface2); }
+  .form-textarea { min-height: 80px; resize: none; line-height: 1.5; }
+  .btn {
+    width: 100%; padding: 13px;
+    background: var(--accent); border: none;
+    border-radius: 10px; color: #fff;
+    font-size: 16px; font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-outline {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); opacity: 1; }
+
+  .record-list { display: flex; flex-direction: column; gap: 10px; }
+  .record-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .record-dot {
+    width: 10px; height: 10px; min-width: 10px;
+    border-radius: 50%; margin-top: 5px;
+  }
+  .record-info .type { font-size: 20px; font-weight: 700; }
+  .record-info .detail { font-size: 18px; color: var(--text2); margin-top: 3px; }
+  .record-info .date { font-size: 16px; color: var(--text3); margin-top: 4px; }
+  .record-km { font-size: 16px; color: var(--accent2); font-weight: 600; }
+  .record-delete {
+    margin-left: auto; background: none; border: none;
+    color: var(--text3); font-size: 18px; cursor: pointer;
+    padding: 2px 6px;
+  }
+  .record-delete:hover { color: var(--red); }
+
+  /* ===== REMINDER ===== */
+  .reminder-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .reminder-icon { font-size: 26px; }
+  .reminder-info { flex: 1; }
+  .reminder-name { font-size: 20px; font-weight: 700; }
+  .reminder-sub { font-size: 16px; color: var(--text2); margin-top: 3px; }
+  .reminder-status {
+    font-size: 15px; font-weight: 700;
+    padding: 3px 10px; border-radius: 10px;
+    white-space: nowrap;
+  }
+  .status-ok { background: rgba(76,175,125,0.15); color: var(--green); }
+  .status-soon { background: rgba(245,166,35,0.15); color: var(--yellow); }
+  .status-over { background: rgba(232,80,74,0.15); color: var(--red); }
+  .progress-bar {
+    height: 4px; background: var(--border); border-radius: 2px;
+    margin-top: 8px; overflow: hidden;
+  }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
+
+  /* ===== AI CHAT ===== */
+  .chat-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 260px;
+    max-height: 380px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .chat-bubble {
+    max-width: 90%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 18px; line-height: 1.6;
+  }
+  .bubble-user {
+    background: var(--accent);
+    color: #fff; border-radius: 12px 12px 2px 12px;
+    align-self: flex-end;
+  }
+  .bubble-ai {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px 12px 12px 2px;
+    align-self: flex-start;
+    color: var(--text);
+  }
+  .bubble-ai .urgency-tag {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 6px;
+    font-size: 12px; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .chat-input-row {
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+  .chat-input {
+    flex: 1; padding: 12px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text); font-size: 20px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none; resize: none;
+    min-height: 52px; max-height: 120px;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-send {
+    width: 48px; height: 48px;
+    background: var(--accent); border: none; border-radius: 10px;
+    color: #fff; font-size: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s; flex-shrink: 0;
+  }
+  .chat-send:hover { opacity: 0.85; }
+  .chat-send:disabled { background: var(--border); cursor: not-allowed; }
+  .api-key-row {
+    display: flex; gap: 8px; margin-bottom: 12px;
+  }
+  .api-key-input {
+    flex: 1; padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text); font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+  }
+  .api-key-input:focus { border-color: var(--accent); }
+  .api-key-save {
+    padding: 10px 16px; background: var(--surface2);
+    border: 1px solid var(--accent); border-radius: 8px;
+    color: var(--accent); font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap;
+  }
+  .api-key-save:hover { background: var(--accent); color: #fff; }
+  .typing-indicator { display: flex; gap: 5px; align-items: center; padding: 8px 4px; }
+  .typing-dot {
+    width: 8px; height: 8px; background: var(--text3);
+    border-radius: 50%; animation: bounce 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* ===== CAR SETUP MODAL ===== */
+  .setup-notice {
+    background: rgba(74,144,226,0.1);
+    border: 1px solid rgba(74,144,226,0.3);
+    border-radius: 8px; padding: 12px 14px;
+    font-size: 13px; color: var(--blue);
+    margin-bottom: 14px; line-height: 1.5;
+  }
+
+  /* ===== SUMMARY CARDS ===== */
+  .summary-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 10px;
+    text-align: center;
+  }
+  .summary-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 700; line-height: 1;
+    margin-bottom: 4px;
+  }
+  .summary-label { font-size: 11px; color: var(--text2); }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text3);
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; line-height: 1.6; }
+
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* ===== TTS ===== */
+  .tts-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text2);
+    font-size: 16px; padding: 5px 12px;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  .tts-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .tts-btn.playing { border-color: var(--accent2); color: var(--accent2); background: rgba(245,166,35,0.1); }
+  .tts-btn .tts-icon { font-size: 18px; }
+
+  /* ===== SCROLL BAR ===== */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div>
+    <div class="app-logo">카<span>닥터</span></div>
+    <div style="font-size:11px;color:var(--text3);margin-top:1px;">내 차 주치의</div>
+  </div>
+  <button class="car-info-badge" onclick="openCarSetup()" id="carBadge">🚗 차량 등록</button>
+</header>
+
+<!-- PAGE 1: 점검 체크리스트 -->
+<div class="page active" id="page-check">
+  <div class="summary-row">
+    <div class="summary-card">
+      <div class="summary-num" id="sumTotal" style="color:var(--text)">0</div>
+      <div class="summary-label">전체 항목</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="sumDone" style="color:var(--green)">0</div>
+      <div class="summary-label">완료</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="sumLeft" style="color:var(--accent)">0</div>
+      <div class="summary-label">미완료</div>
+    </div>
+  </div>
+
+  <!-- 엔진 -->
+  <div class="card">
+    <div class="card-title"><span class="emoji">🔧</span> 엔진 계통</div>
+    <div id="checkList-engine"></div>
+  </div>
+  <!-- 하체/제동 -->
+  <div class="card">
+    <div class="card-title"><span class="emoji">🛞</span> 하체 및 제동</div>
+    <div id="checkList-brake"></div>
+  </div>
+  <!-- 전기/등화 -->
+  <div class="card">
+    <div class="card-title"><span class="emoji">⚡</span> 전기 및 등화</div>
+    <div id="checkList-elec"></div>
+  </div>
+  <!-- 실내/공조 -->
+  <div class="card">
+    <div class="card-title"><span class="emoji">❄️</span> 실내 및 공조</div>
+    <div id="checkList-cabin"></div>
+  </div>
+  <!-- 소모품 -->
+  <div class="card">
+    <div class="card-title"><span class="emoji">🧴</span> 소모품 관리</div>
+    <div id="checkList-consumable"></div>
+  </div>
+
+  <button class="btn btn-outline" onclick="resetChecks()" style="margin-bottom:16px;">✕ 체크 전체 초기화</button>
+</div>
+
+<!-- PAGE 2: 정비 기록 -->
+<div class="page" id="page-record">
+  <div class="section-title">정비 기록</div>
+  <div class="card record-form">
+    <div class="card-title"><span class="emoji">📝</span> 새 기록 추가</div>
+    <div class="form-row">
+      <div class="form-label">정비 종류</div>
+      <select class="form-select" id="recType">
+        <option>엔진오일 교환</option>
+        <option>타이어 교환</option>
+        <option>타이어 위치 교환</option>
+        <option>브레이크 패드 교환</option>
+        <option>브레이크액 교환</option>
+        <option>에어컨 필터 교환</option>
+        <option>에어 필터 교환</option>
+        <option>냉각수 보충/교환</option>
+        <option>배터리 교환</option>
+        <option>와이퍼 교환</option>
+        <option>타이밍벨트/체인</option>
+        <option>점화플러그 교환</option>
+        <option>변속기오일 교환</option>
+        <option>기타</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-label">주행거리 (km)</div>
+      <input type="number" class="form-input" id="recKm" placeholder="예: 52000">
+    </div>
+    <div class="form-row">
+      <div class="form-label">날짜</div>
+      <input type="date" class="form-input" id="recDate">
+    </div>
+    <div class="form-row">
+      <div class="form-label">메모 (선택)</div>
+      <textarea class="form-textarea" id="recNote" placeholder="정비소명, 비용, 특이사항 등"></textarea>
+    </div>
+    <button class="btn" onclick="addRecord()">기록 저장</button>
+  </div>
+
+  <div class="section-title" style="margin-top:4px;">기록 목록</div>
+  <div id="recordList">
+    <div class="empty-state">
+      <div class="empty-icon">🗒️</div>
+      <p>아직 정비 기록이 없습니다.<br>첫 번째 기록을 추가해보세요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: 경고등 진단 -->
+<div class="page" id="page-warning">
+  <div class="section-title">경고등 진단</div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">켜진 경고등을 선택하면 의미와 조치법을 확인할 수 있습니다.</p>
+  <div class="warning-grid" id="warningGrid"></div>
+</div>
+
+<!-- PAGE 4: 정비 알림 -->
+<div class="page" id="page-remind">
+  <div class="section-title">정비 시기 알림</div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="form-row">
+      <div class="form-label">현재 주행거리 (km)</div>
+      <div style="display:flex;gap:8px;">
+        <input type="number" class="form-input" id="currentKm" placeholder="예: 52000">
+        <button class="api-key-save" onclick="updateReminders()">확인</button>
+      </div>
+    </div>
+  </div>
+  <div id="reminderList"></div>
+</div>
+
+<!-- PAGE 5: AI 진단 -->
+<div class="page" id="page-ai">
+  <div class="section-title">AI 증상 진단</div>
+  <div class="card" style="margin-bottom:12px;padding:12px 14px;">
+    <div style="font-size:16px;color:var(--text2);margin-bottom:8px;font-weight:700;">🔑 API 키 설정</div>
+    <div style="font-size:16px;color:var(--text3);margin-bottom:6px;">Claude API 키 (AI 진단용)</div>
+    <div class="api-key-row">
+      <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-ant-api03-...">
+      <button class="api-key-save" onclick="saveApiKey()">저장</button>
+    </div>
+    <div style="font-size:15px;color:var(--text3);margin-bottom:12px;">키는 기기에만 저장됩니다.</div>
+    <div style="font-size:16px;color:var(--text3);margin-bottom:6px;">Google Cloud TTS API 키 (음성 읽기용)</div>
+    <div class="api-key-row">
+      <input type="password" class="api-key-input" id="googleTtsKeyInput" placeholder="AIzaSy...">
+      <button class="api-key-save" onclick="saveGoogleTtsKey()">저장</button>
+    </div>
+    <div style="font-size:15px;color:var(--text3);">키는 기기에만 저장됩니다. <span id="googleTtsKeyMsg" style="color:var(--green);"></span></div>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="bubble-ai chat-bubble">
+      안녕하세요! 저는 자동차 증상 진단 AI입니다. 🚗<br><br>
+      어떤 증상이 있으신가요? 예를 들어:<br>
+      • "브레이크 밟을 때 끼익 소리가 납니다"<br>
+      • "시동이 잘 안 걸려요"<br>
+      • "핸들이 한쪽으로 쏠려요"<br><br>
+      증상을 자세히 설명해 주시면 더 정확하게 진단해 드릴게요.
+    </div>
+  </div>
+
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chatInput" placeholder="증상을 입력하세요..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+    <button class="chat-send" id="chatSendBtn" onclick="sendChat()">↑</button>
+  </div>
+  <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;">AI 진단은 참고용입니다. 심각한 증상은 반드시 전문 정비소에 방문하세요.</p>
+</div>
+
+<!-- NAV -->
+<nav class="nav-tabs">
+  <button class="nav-tab active" onclick="goPage('check',this)">
+    <span class="icon">✅</span>점검
+  </button>
+  <button class="nav-tab" onclick="goPage('record',this)">
+    <span class="icon">📋</span>기록
+  </button>
+  <button class="nav-tab" onclick="goPage('warning',this)">
+    <span class="icon">⚠️</span>경고등
+  </button>
+  <button class="nav-tab" onclick="goPage('remind',this)">
+    <span class="icon">🔔</span>알림
+  </button>
+  <button class="nav-tab" onclick="goPage('ai',this)">
+    <span class="icon">🤖</span>AI진단
+  </button>
+</nav>
+
+<!-- CHECK DETAIL MODAL -->
+<div class="modal-overlay" id="checkDetailModal" onclick="if(event.target===this)closeModal('checkDetailModal')">
+  <div class="modal" style="position:relative;">
+    <div class="modal-handle"></div>
+    <div id="checkDetailContent"></div>
+  </div>
+</div>
+
+<!-- CAR SETUP MODAL -->
+<div class="modal-overlay" id="carModal" onclick="if(event.target===this)closeModal('carModal')">
+  <div class="modal" style="position:relative;">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🚗 내 차량 등록</div>
+    <div class="setup-notice">차량 정보를 등록하면 더 정확한 정비 알림을 받을 수 있습니다.</div>
+    <div class="form-row">
+      <div class="form-label">차종 / 모델명</div>
+      <input type="text" class="form-input" id="carModel" placeholder="예: 현대 아반떼 2020년식">
+    </div>
+    <div class="form-row">
+      <div class="form-label">현재 주행거리 (km)</div>
+      <input type="number" class="form-input" id="carKm" placeholder="예: 52000">
+    </div>
+    <div class="form-row">
+      <div class="form-label">연료 종류</div>
+      <select class="form-select" id="carFuel">
+        <option>가솔린</option><option>디젤</option><option>LPG</option><option>하이브리드</option><option>전기</option>
+      </select>
+    </div>
+    <button class="btn" onclick="saveCarInfo()" style="margin-top:4px;">저장</button>
+  </div>
+</div>
+
+<!-- WARNING DETAIL MODAL -->
+<div class="modal-overlay" id="warnModal" onclick="if(event.target===this)closeModal('warnModal')">
+  <div class="modal" style="position:relative;">
+    <div class="modal-handle"></div>
+    <div id="warnModalContent"></div>
+    <button class="btn btn-outline" onclick="closeModal('warnModal')" style="margin-top:12px;">닫기</button>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const CHECK_DATA = {
+  engine: [
+    { id:'e1', name:'엔진오일 잔량/상태', desc:'게이지로 잔량 확인, 색상이 검다면 교환 시기', interval:'5,000~10,000km마다', diff:'easy',
+      detail:`🔍 확인 방법\n① 시동을 끄고 5분 기다린다 (오일이 아래로 내려옴)\n② 노란색 손잡이의 오일 게이지(딥스틱)를 뽑는다\n③ 깨끗이 닦고 다시 꽂은 뒤 다시 뽑아 확인\n④ 오일 레벨이 F(Full)~L(Low) 사이에 있어야 정상\n\n🎨 오일 색상 판단\n• 맑은 황금색/갈색 → 양호\n• 진한 검정색 → 교환 시기 도래\n• 우유빛/크림색 → 냉각수 혼입 (즉시 정비소)\n\n⚠️ 주의사항\n엔진 과열 상태에서 절대 확인하지 말 것. 오일 부족 시 장거리 주행 금지.` },
+    { id:'e2', name:'냉각수(부동액) 수위', desc:'보조 탱크 MIN~MAX 사이 확인. 뜨거울 때 절대 열지 말 것', interval:'6개월마다', diff:'easy',
+      detail:`🔍 확인 방법\n① 시동 끄고 엔진이 완전히 식은 후 진행\n② 엔진룸 내 흰색/반투명 보조 탱크 찾기\n③ 측면 눈금이 MIN~MAX 사이인지 확인\n④ 부족하면 냉각수 전용 제품으로 보충\n\n🚨 절대 주의!\n엔진이 뜨거울 때 라디에이터 캡을 열면 고온 증기가 분출되어 심각한 화상을 입을 수 있습니다.\n\n💡 보충 시 팁\n• 물만 넣으면 겨울에 얼고 부식 발생\n• 반드시 냉각수(부동액) 전용 제품 사용\n• 색이 다른 냉각수 혼합 주의 (화학반응)` },
+    { id:'e3', name:'구동벨트 상태', desc:'"끼익" 소음이나 갈라짐 육안 확인', interval:'40,000km 또는 4년', diff:'mid',
+      detail:`🔍 확인 방법\n① 엔진룸 앞쪽의 고무 벨트들을 육안으로 확인\n② 벨트 표면에 실금/갈라짐이 있는지 확인\n③ 벨트가 늘어나거나 처져있는지 확인\n\n🔊 소음으로 판단\n• 시동 시 또는 에어컨 켤 때 "끼익" 소리 → 벨트 마모/늘어남\n• 지속적인 긁히는 소리 → 즉시 점검\n\n🔧 교환 필요 신호\n• 표면에 균열이 보일 때\n• 4년 또는 40,000km 이상 경과\n• 벨트에서 소음 발생 시\n\n주요 구동벨트: 타이밍벨트, 팬벨트(에어컨/발전기 구동)` },
+    { id:'e4', name:'에어 필터 점검', desc:'심하게 오염됐으면 출력 저하 원인', interval:'20,000~30,000km', diff:'easy',
+      detail:`🔍 확인 방법\n① 엔진룸에서 검정 플라스틱 박스(에어 클리너 박스) 찾기\n② 클립이나 나사를 풀고 필터 꺼내기\n③ 밝은 곳에서 빛에 비춰 오염도 확인\n\n🎨 상태 판단\n• 밝은 회색/흰색 → 양호\n• 짙은 회색/갈색 → 교환 권장\n• 검정색/기름때 → 즉시 교환\n\n💡 효과\n• 교환 시 연비 약 5~10% 개선\n• 엔진 출력 회복\n• 황사/미세먼지 많은 환경에서는 더 자주 교환\n\n✅ DIY 난이도: 매우 쉬움 (공구 불필요, 10분 작업)` },
+    { id:'e5', name:'점화플러그 확인', desc:'시동 불량·연비 저하 시 점검 권장', interval:'60,000~100,000km', diff:'hard',
+      detail:`🔍 증상으로 판단 (자가 진단)\n• 시동이 잘 안 걸림\n• 공회전이 불안정하게 떨림\n• 가속이 부드럽지 않음\n• 연비가 급격히 나빠짐\n• 시동 시 "부르르" 진동\n\n🔧 점화플러그 종류\n• 일반 플러그: 20,000~30,000km\n• 이리듐/백금 플러그: 60,000~100,000km\n\n⚠️ 자가 교환 주의\n플러그 위치와 탈착이 어려울 수 있으며, 잘못 조이면 엔진 손상 가능. 경험이 없다면 정비소 방문 권장.\n\n💰 비용 참고: 공임 포함 4만~15만원 (차종마다 상이)` },
+  ],
+  brake: [
+    { id:'b1', name:'타이어 마모도', desc:'100원 동전 홈 깊이 테스트 – 이순신 머리가 보이면 교환', interval:'매월', diff:'easy',
+      detail:`🔍 100원 동전 테스트\n① 100원짜리 동전을 타이어 홈에 세워서 꽂는다\n② 이순신 장군 머리가 보이면 → 교환 필요\n③ 머리가 안 보이면 → 아직 여유 있음\n\n📏 법적 기준\n• 타이어 마모 한계선: 1.6mm\n• 겨울용 타이어: 4mm 이하 시 교환 권장\n\n🌧️ 위험성\n마모된 타이어는 빗길에서 수막현상 발생으로 제동 거리가 정상 타이어의 2~3배까지 늘어납니다.\n\n🔢 타이어 생산 연도 확인\n타이어 옆면의 4자리 숫자 (예: 2319 = 2019년 23번째 주 생산)\n• 5년 이상 경과 시 교환 권장 (마모 없어도)` },
+    { id:'b2', name:'타이어 공기압', desc:'타이어 측면 적정 공기압 확인 (주유소 에어 체크)', interval:'매월', diff:'easy',
+      detail:`🔍 적정 공기압 확인 위치\n• 운전석 문 안쪽 스티커 (가장 정확)\n• 타이어 옆면 숫자 (최대압력이므로 참고만)\n• 차량 매뉴얼\n\n📊 일반적인 적정 공기압\n• 소형차: 32~35 psi (앞/뒤 동일)\n• 중형차: 33~36 psi\n• SUV: 35~40 psi\n\n⚠️ 공기압 이상 증상\n• 낮을 때: 연비 저하, 핸들 무거움, 타이어 옆면 마모\n• 높을 때: 승차감 딱딱, 타이어 중앙부 마모, 미끄러짐\n\n💡 주유소 에어 체크 이용 시\n차가운 상태(주행 전)에서 측정이 정확합니다. 주행 후에는 공기가 팽창해 0.5~1psi 높게 나옵니다.` },
+    { id:'b3', name:'브레이크 패드 두께', desc:'바퀴 사이로 패드 확인. 쇠 긁는 소리 나면 즉시 교환', interval:'30,000~50,000km', diff:'mid',
+      detail:`🔍 자가 확인 방법\n① 바퀴 사이로 캘리퍼와 디스크 로터 사이 패드 확인\n② 패드 두께가 3mm 이하면 교환 시기\n③ 패드에 홈이 거의 없으면 교환 권장\n\n🔊 소리로 판단\n• "끼익" 고음 소리 → 마모 경고음 (금속 마찰)\n• "끼걱끼걱" 저음 소리 → 패드 완전 소모, 디스크 손상 중\n\n⚠️ 방치 시 위험\n패드 완전 소모 시 금속끼리 마찰 → 디스크 로터 손상 → 수리비 수배 증가\n\n💰 교환 비용 참고\n• 패드만 교환: 앞 4~8만원, 뒤 4~7만원\n• 디스크+패드 교환: 앞 15~30만원\n\n앞 브레이크가 뒤보다 2~3배 빨리 마모됩니다.` },
+    { id:'b4', name:'브레이크액 수위', desc:'리저버 탱크 MIN 이하면 보충 또는 패드 점검', interval:'2년 또는 40,000km', diff:'mid',
+      detail:`🔍 확인 방법\n① 엔진룸에서 노란 뚜껑의 반투명 리저버 탱크 찾기\n② MIN~MAX 사이인지 확인\n③ 액체 색이 맑은지 확인 (진한 갈색이면 교환)\n\n💡 브레이크액이 줄어드는 이유\n• 정상: 브레이크 패드 마모로 자연히 감소 (패드 교환 시 보충)\n• 이상: 누유 → 즉시 정비소\n\n🚨 수분 오염 주의\n브레이크액은 수분을 흡수(흡습성)합니다.\n• 수분 함량 3% 이상 시 끓는점 급격히 낮아짐\n• 장거리 산악 주행 시 브레이크 페이드(제동력 상실) 위험\n• 2년마다 교환 권장\n\n⚠️ 보충 시 같은 규격 사용 (DOT3, DOT4 혼용 가능하나 하위 규격 사용 금지)` },
+    { id:'b5', name:'핸들 쏠림 확인', desc:'직선 주행 시 핸들이 쏠리면 얼라이먼트 점검', interval:'수시 확인', diff:'easy',
+      detail:`🔍 자가 진단 방법\n① 평탄한 직선 도로에서 핸들에서 손을 살짝 뗀다\n② 차가 한쪽으로 쏠리면 얼라이먼트 이상\n③ 핸들 자체가 틀어져 있어도 얼라이먼트 이상\n\n🔧 원인 분류\n• 한쪽으로 쏠림 → 휠 얼라이먼트 틀어짐\n• 핸들 떨림 → 휠 밸런스 불량\n• 제동 시에만 쏠림 → 브레이크 불균형\n\n언제 틀어지나?\n• 과속방지턱 충격\n• 연석(도로 경계석)에 긁힘\n• 타이어 교환 후 (항상 얼라이먼트 함께 권장)\n\n💰 비용: 얼라이먼트 3~5만원, 밸런스 1~2만원` },
+    { id:'b6', name:'타이어 옆면 균열', desc:'갈라짐이나 혹(돌출) 있으면 즉시 교환', interval:'수시 확인', diff:'easy',
+      detail:`🔍 확인 방법\n① 타이어 옆면(사이드월) 전체를 손으로 느끼고 눈으로 확인\n② 앞뒤로 차를 조금씩 움직여 전체 면 확인\n\n⚠️ 즉시 교환 필요한 상태\n• 측면에 혹(불룩하게 부풀음) 발생 → 내부 코드 손상, 주행 중 파열 위험\n• 깊은 균열이 여러 곳 → 노화로 인한 구조 약화\n• 못/철사 박힘 → 서서히 공기 빠짐\n\n🔵 혹(벌지)이 생기는 이유\n과속방지턱이나 충격으로 내부 코드가 끊어지면 발생합니다. 겉보기엔 공기압이 정상이어도 주행 중 갑자기 파열될 수 있어 매우 위험합니다.` },
+  ],
+  elec: [
+    { id:'el1', name:'배터리 단자 부식', desc:'흰색/녹색 부식물이 있으면 청소 또는 교환', interval:'1년마다', diff:'mid',
+      detail:`🔍 확인 방법\n① 엔진룸의 배터리 위치 확인 (주로 검정 사각형 박스)\n② 빨간(+)·검정(-) 단자 주변에 흰색/녹색 가루 있는지 확인\n③ 배터리 상단 인디케이터 색 확인\n\n🔋 인디케이터 색 판단\n• 초록 → 정상\n• 검정 → 방전 또는 불량\n• 흰색/투명 → 전해액 부족\n\n🧹 부식 제거 방법 (DIY)\n① 시동 끄기\n② 베이킹소다+물을 솔로 부드럽게 닦기\n③ 물로 헹구고 완전히 건조\n④ 단자에 바셀린 또는 단자 보호 스프레이 도포\n\n💡 배터리 수명: 3~5년. 겨울에 방전이 잦아지면 교환 시기.` },
+    { id:'el2', name:'전조등 정상 점등', desc:'하향등·상향등 모두 작동 여부 확인', interval:'수시 확인', diff:'easy',
+      detail:`🔍 확인 방법\n① 야간 주차 상태에서 벽이나 차고 문 앞에 세우기\n② 하향등(로우빔) → 상향등(하이빔) → 안개등 순서로 점등 확인\n③ 좌우 밝기가 다르면 한쪽 전구 불량\n\n💡 전구 종류별 수명\n• 할로겐: 약 500~1,000시간\n• HID(크세논): 약 2,000~3,000시간\n• LED: 1만 시간 이상\n\n🔧 DIY 교환 여부\n• 할로겐: 비교적 쉬움 (차종마다 다름)\n• HID/LED: 정비소 권장 (고압 주의)\n\n⚠️ 한쪽만 나가면 상향등으로 착각될 수 있어 맞은편 운전자에게 위험. 빠른 교환 권장.` },
+    { id:'el3', name:'방향지시등 작동', desc:'속도가 달라지거나 깜빡이면 전구 점검', interval:'수시 확인', diff:'easy',
+      detail:`🔍 확인 방법\n① 차 앞·뒤에서 방향지시등 작동 확인\n② 실내 계기판의 화살표 점등 속도 확인\n\n🔊 이상 신호\n• 평소보다 빠르게 깜빡임 → 같은 방향 전구 하나 불량\n• 한쪽 방향지시등만 안됨 → 해당 방향 전구 불량\n• 계기판에만 뜨고 밖에서 안 보임 → 외부 전구 불량\n\n✅ DIY 교환\n전구 교환은 가장 쉬운 DIY 정비 중 하나입니다.\n① 차종 맞는 전구 구매 (차량 매뉴얼 확인, 보통 T10 또는 BA15S 규격)\n② 트렁크 또는 엔진룸에서 소켓 분리\n③ 전구 교체 → 10분 이내 작업\n\n⚠️ 방향지시등 불량은 차선변경 시 사고 위험 및 교통법규 위반(과태료 3만원).` },
+    { id:'el4', name:'브레이크등 확인', desc:'벽에 비추거나 도움 받아 확인', interval:'3개월마다', diff:'easy',
+      detail:`🔍 혼자 확인하는 방법\n① 야간에 벽이나 차고 문에 차 뒤를 가깝게 붙이기\n② 브레이크 페달을 밟으면 벽에 붉은 빛이 반사되는지 확인\n③ 스마트폰을 차 뒤에 놓고 동영상 촬영 후 확인\n\n⚠️ 브레이크등 불량의 위험성\n뒤에서 오는 차가 제동 상황을 모르므로 추돌 사고 위험이 매우 높습니다.\n\n🔧 교환 방법\n• 트렁크 안쪽 패널 열기\n• 전구 소켓 돌려서 분리\n• 전구 교체 (1157 또는 7528 규격)\n\n💡 하이마운트 스톱램프(뒷 유리 위 브레이크등)도 함께 확인 권장.` },
+    { id:'el5', name:'와이퍼 상태', desc:'줄무늬나 채터링(떨림) 발생 시 교환', interval:'6개월~1년', diff:'easy',
+      detail:`🔍 이상 신호\n• 와이퍼 작동 시 줄무늬가 남음\n• 떨리거나 소음이 남 (채터링)\n• 비 올 때 시야 확보가 잘 안 됨\n\n🗓️ 교환 시기\n• 일반 와이퍼: 6개월~1년\n• 겨울 전: 반드시 점검 (서리/눈 대비)\n• 장마 전: 반드시 점검 (폭우 대비)\n\n✅ DIY 교환 (가장 쉬운 DIY)\n① 기존 와이퍼 들어 올리기\n② 연결 부위 버튼/탭 누르고 분리\n③ 새 와이퍼 끼우기\n④ 작동 확인\n\n💡 차종 맞는 규격은 마트/용품점에서 차 등록증 보여주면 바로 찾아줍니다. 운전석/조수석 길이가 다를 수 있으니 꼭 확인.` },
+  ],
+  cabin: [
+    { id:'c1', name:'에어컨 필터 교환', desc:'글로브박스 안쪽에 위치. 먼지/냄새 심하면 교환', interval:'6개월~1년', diff:'easy',
+      detail:`🔍 위치 찾기\n대부분의 차량: 조수석 글로브박스(서랍) 안쪽에 있습니다.\n\n✅ 교환 방법 (10분, 공구 불필요)\n① 글로브박스를 끝까지 당겨 내리기 (양쪽 클립 누르며)\n② 필터 케이스 열기\n③ 오래된 필터 꺼내기 (방향 확인)\n④ 새 필터 삽입 → 화살표 방향 주의\n⑤ 조립 순서 반대로 복원\n\n💡 효과\n• 에어컨/히터 냄새 제거\n• 실내 미세먼지 차단\n• 에어컨 효율 향상\n\n🛒 구매 팁\n마트/인터넷에서 차종 맞는 필터 5,000~15,000원. 정비소 공임 2~3만원 절약 가능.` },
+    { id:'c2', name:'계기판 경고등 확인', desc:'빨간 경고등은 즉시 조치, 노란 경고등은 점검 요함', interval:'시동 시마다', diff:'easy',
+      detail:`🚦 경고등 색상별 긴급도\n\n🔴 빨간색 → 즉시 정차/정비소\n• 엔진오일 압력 경고\n• 수온 과열 경고\n• 배터리 방전 경고\n• 브레이크 계통 경고\n\n🟡 노란색 → 조기 점검 권장\n• 엔진 체크(MIL)\n• ABS 경고\n• 에어백 경고\n• 타이어 공기압 경고\n• 연료 부족\n\n🟢 초록/파랑 → 작동 중 표시 (정상)\n• 방향지시등\n• 상향등\n• ESP 작동 중\n\n💡 시동 시 잠깐 켜졌다 꺼지는 것은 정상 (자기진단 과정)\n켜진 채로 유지되면 이상 신호입니다.` },
+    { id:'c3', name:'워셔액 잔량', desc:'워셔액 부족 시 물 대신 전용 워셔액 보충', interval:'수시 확인', diff:'easy',
+      detail:`🔍 확인 방법\n① 엔진룸에서 파란 뚜껑(와이퍼 모양 그림) 탱크 찾기\n② 탱크 측면 눈금 또는 계기판 경고등 확인\n\n💧 올바른 보충 방법\n• 전용 워셔액 사용 (사계절용 또는 겨울용)\n• 물만 넣으면? → 겨울에 얼어 분사 노즐 막힘, 세척력 저하\n• 알코올 과다 혼합 금지 (고무 부품 손상)\n\n❄️ 계절별 농도 조절\n• 여름: 워셔액 원액 30~50% 희석\n• 겨울: 원액 그대로 또는 60% 이상\n\n💡 워셔액이 잘 안 나올 때\n노즐 막힘 가능성 → 바늘이나 핀으로 노즐 구멍 뚫기 (차 앞 노즐 확인)` },
+    { id:'c4', name:'실내 냄새 확인', desc:'탄 냄새·고무 냄새는 정비소 점검 필요', interval:'수시 확인', diff:'easy',
+      detail:`👃 냄새로 문제 진단\n\n🔴 즉시 정차 필요한 냄새\n• 타는 냄새/연기 냄새 → 전기 합선 또는 마찰열\n• 가스 냄새 (달달한 냄새) → 냉각수 누출\n• 달걀 썩는 냄새 → 촉매 변환기 문제\n\n🟡 점검 권장 냄새\n• 고무 타는 냄새 → 벨트 또는 타이어 마찰\n• 기름 냄새 → 오일 누유\n• 휘발유 냄새 → 연료 계통 누유\n\n🟢 관리로 해결 가능한 냄새\n• 에어컨 켤 때 곰팡이 냄새 → 에어컨 필터 교환 + 항균 스프레이\n• 오래된 실내 냄새 → 환기, 청소, 방향제\n\n즉시 정차가 필요한 냄새가 날 때는 창문을 열고 안전한 곳에 정차 후 시동을 끄세요.` },
+  ],
+  consumable: [
+    { id:'co1', name:'엔진오일 교환', desc:'잔량뿐 아니라 교환 주기도 확인 필수', interval:'7,500~10,000km', diff:'hard',
+      detail:`🔧 교환 주기 기준\n• 일반 광유: 5,000~7,500km\n• 합성유: 10,000~15,000km\n• 고급 합성유: 15,000~20,000km\n\n💡 단순 주행거리 외 고려 사항\n• 6개월 이상 경과 시 주행거리 미달해도 교환\n• 시내 단거리 주행 위주 → 더 짧은 주기 권장\n• 터보 엔진 → 더 자주 교환 (5,000~7,500km)\n\n오일 규격 확인\n• 차량 매뉴얼에 지정된 점도(예: 5W-30) 확인\n• 계절에 따라 점도 다른 제품 사용 가능\n\n💰 비용 참고\n• 광유 + 교환: 2~4만원\n• 합성유 + 교환: 5~10만원\n\n⚠️ 오일 필터도 동시 교환 권장 (2회에 1회)` },
+    { id:'co2', name:'미션오일(자동) 확인', desc:'변속 충격이 있거나 주행거리 도래 시 점검', interval:'40,000~60,000km', diff:'hard',
+      detail:`🔍 이상 증상으로 자가 진단\n• 변속 시 "쿵"하는 충격\n• 변속이 늦거나 부드럽지 않음\n• D단 놓았을 때 차가 잘 나가지 않음\n• 주차 후 오일 색깔 바닥 얼룩 (빨간색)\n\n🔧 교환 주기\n• 일반 자동변속기: 40,000~60,000km\n• 무단변속기(CVT): 40,000~50,000km 권장\n• 평생 교환 불필요? → 오해! 오염되면 변속기 수명 단축\n\n💰 비용\n• 드레인 & 필 방식: 10~15만원\n• 완전 순환 교환: 20~30만원\n\n⚠️ 변속기 고장 수리비는 100만~300만원 이상. 예방이 훨씬 경제적입니다.` },
+    { id:'co3', name:'파워스티어링액', desc:'핸들이 무거워지면 수위 확인', interval:'1년마다', diff:'mid',
+      detail:`🔍 확인 방법\n① 엔진룸에서 핸들 모양 그림의 뚜껑 탱크 찾기\n② MIN~MAX 사이인지 확인\n③ 액체 색이 맑은 붉은색/갈색인지 확인\n\n⚠️ 이상 신호\n• 핸들이 갑자기 무거워짐 → 즉시 수위 확인\n• 핸들 돌릴 때 "웅~" 소음 → 수위 부족 또는 펌프 이상\n• 파킹 시 꺽을 때 소음 → 동일\n\n💡 전동식 파워스티어링(MDPS) 차량\n최근 출시 차량 대부분은 전동식이므로 오일 없음. 차량 매뉴얼로 확인 필요.\n\n보충 시 반드시 차종 맞는 파워스티어링 전용 오일 사용 (일반 오일 대체 불가).` },
+    { id:'co4', name:'타이어 위치 교환', desc:'앞뒤 마모 균등화로 타이어 수명 연장', interval:'10,000~15,000km', diff:'hard',
+      detail:`💡 왜 필요한가?\n앞 타이어는 조향+제동으로 뒤보다 2~3배 빨리 마모됩니다. 위치를 교환해 4개 타이어를 균등하게 사용하면 수명이 크게 늘어납니다.\n\n🔄 교환 패턴\n• 전륜구동(FF): 앞→뒤 직진, 뒤→앞 X자 교차\n• 후륜구동(FR): 앞→뒤 X자, 뒤→앞 직진\n• 방향성 타이어: 앞뒤만 교환 (좌우 교차 불가)\n\n💰 비용\n위치 교환 공임: 2~4만원 (타이어 교체 없음)\n\n📊 효과\n• 타이어 4개를 같은 시기에 교환 가능\n• 타이어 전체 수명 약 20~30% 연장\n• 10만km 기준 타이어 비용 수십만원 절약 가능` },
+  ]
+};
+
+const WARNING_DATA = [
+  { icon:'🔴', name:'엔진 경고등', urgency:'red', urgLabel:'즉시 점검',
+    detail:'엔진 제어 시스템 이상 신호입니다.\n\n가능한 원인:\n• 산소 센서 불량\n• 점화코일/플러그 불량\n• 연료 캡 미체결\n• 촉매 변환기 이상\n\n조치: 빨간색이면 즉시 정지, 노란색이면 가까운 정비소 방문.' },
+  { icon:'🛢️', name:'오일 압력 경고', urgency:'red', urgLabel:'즉시 정지',
+    detail:'엔진오일 압력이 매우 낮습니다.\n\n이 경고등이 켜지면:\n• 즉시 안전한 곳에 정차\n• 시동 끄기\n• 오일 잔량 확인\n• 잔량 있어도 계속 켜지면 오일 펌프 고장 가능\n\n⚠️ 주행 계속 시 엔진 심각한 손상 발생!' },
+  { icon:'🌡️', name:'수온 과열 경고', urgency:'red', urgLabel:'즉시 정지',
+    detail:'냉각수 온도가 위험 수준입니다.\n\n즉시 조치:\n1. 안전한 곳에 정차\n2. 시동 끄기 (팬은 계속 작동)\n3. 절대 라디에이터 캡 열지 말 것\n4. 10~15분 후 냉각수 확인\n5. 견인 또는 정비소 연락' },
+  { icon:'🔋', name:'배터리 경고등', urgency:'yellow', urgLabel:'조기 점검',
+    detail:'발전기(알터네이터) 또는 배터리 문제입니다.\n\n가능한 원인:\n• 배터리 노후화\n• 알터네이터 고장\n• 구동벨트 끊김\n\n조치: 당일 정비소 방문 권장. 주행 중 방전으로 갑자기 멈출 수 있습니다.' },
+  { icon:'⛽', name:'연료 부족 경고', urgency:'yellow', urgLabel:'주유 필요',
+    detail:'연료가 매우 적습니다.\n\n잔여 주행 가능 거리:\n• 가솔린/디젤: 약 50~80km\n• 경고 이후 지속 주행 시 연료 펌프 과열 손상 가능\n\n즉시 주유하세요!' },
+  { icon:'🅿️', name:'주차브레이크 표시', urgency:'yellow', urgLabel:'확인 필요',
+    detail:'주행 중 이 등이 켜졌다면:\n\n1. 주차 브레이크가 덜 풀린 것\n   → 브레이크 레버/페달 완전히 해제\n\n2. 브레이크액 수위 부족\n   → 리저버 탱크 확인 후 보충\n\n해제 후에도 켜져 있으면 정비소 방문.' },
+  { icon:'🔄', name:'ABS 경고등', urgency:'yellow', urgLabel:'조기 점검',
+    detail:'ABS(잠김 방지 브레이크 시스템) 이상입니다.\n\n영향:\n• 일반 브레이킹은 정상 작동\n• 급제동 시 바퀴 잠김 가능성 있음\n• 빗길/눈길에서 위험\n\n조치: 가급적 빠른 시일 내 정비소 방문.' },
+  { icon:'🔓', name:'에어백 경고등', urgency:'yellow', urgLabel:'조기 점검',
+    detail:'에어백 시스템 이상입니다.\n\n영향:\n• 사고 시 에어백이 작동하지 않을 수 있음\n• 드문 경우 갑작스러운 에어백 전개 가능\n\n조치: 안전과 직결되므로 빠른 정비소 방문 권장.' },
+  { icon:'🌀', name:'타이어 공기압 경고', urgency:'yellow', urgLabel:'확인 필요',
+    detail:'하나 이상의 타이어 공기압이 낮습니다.\n\n조치:\n1. 안전한 속도로 주행\n2. 주유소에서 공기압 확인/보충\n3. 적정 공기압: 타이어 측면 또는 운전석 문 안쪽 스티커 확인\n4. 보충 후에도 계속 경고 시 펑크 가능성' },
+  { icon:'❄️', name:'ESP/TCS 경고등', urgency:'green', urgLabel:'참고',
+    detail:'전자식 자세 제어 장치 작동 중입니다.\n\n깜빡이는 경우:\n• 미끄러운 노면에서 정상 작동 중 – 정상\n\n계속 켜져 있는 경우:\n• 시스템 오류 가능성\n• 정비소 방문 권장\n\n조치: 미끄러운 도로에서는 감속 주행.' },
+  { icon:'🔦', name:'전조등 경고등', urgency:'green', urgLabel:'확인 후 조치',
+    detail:'전조등 관련 이상입니다.\n\n확인 사항:\n• 전구 나간 것 직접 확인\n• 차량 앞/뒤/옆에서 모든 등화 점검\n\n전구 교환 난이도:\n• 일반 전구: DIY 가능 (유튜브 참고)\n• HID/LED: 정비소 권장' },
+  { icon:'⚙️', name:'변속기 경고등', urgency:'red', urgLabel:'점검 필요',
+    detail:'자동변속기 이상 신호입니다.\n\n증상:\n• 변속 충격\n• 변속 지연\n• 특정 단수 고정\n\n조치:\n• 가까운 정비소 방문\n• 변속기 오일 점검\n• 고온 상태라면 잠시 정차 후 식히기' },
+];
+
+const REMINDER_DATA = [
+  { icon:'🛢️', name:'엔진오일 교환', km:7500, color:'var(--accent)', id:'oil' },
+  { icon:'🧩', name:'에어 필터 교환', km:25000, color:'var(--accent2)', id:'airfilter' },
+  { icon:'❄️', name:'에어컨 필터 교환', km:15000, color:'var(--blue)', id:'acfilter' },
+  { icon:'🛞', name:'타이어 위치 교환', km:12000, color:'var(--green)', id:'tirerot' },
+  { icon:'🔵', name:'브레이크액 교환', km:40000, color:'var(--red)', id:'brakeoil' },
+  { icon:'🌊', name:'냉각수 교환', km:40000, color:'var(--blue)', id:'coolant' },
+  { icon:'🔋', name:'배터리 점검', km:30000, color:'var(--accent2)', id:'battery' },
+  { icon:'💧', name:'미션오일 교환', km:50000, color:'var(--text2)', id:'mission' },
+];
+
+// ===== STATE =====
+let checks = JSON.parse(localStorage.getItem('carChecks') || '{}');
+let records = JSON.parse(localStorage.getItem('carRecords') || '[]');
+let carInfo = JSON.parse(localStorage.getItem('carInfo') || '{}');
+let lastRecordKm = JSON.parse(localStorage.getItem('lastRecordKm') || '{}');
+let apiKey = localStorage.getItem('carApiKey') || '';
+let chatHistory = [];
+
+// ===== INIT =====
+function init() {
+  renderChecks();
+  renderRecords();
+  renderWarnings();
+  renderReminders();
+  updateSummary();
+  if(carInfo.model) document.getElementById('carBadge').textContent = '🚗 ' + carInfo.model;
+  if(apiKey) document.getElementById('apiKeyInput').value = apiKey;
+  if(googleTtsKey) document.getElementById('googleTtsKeyInput').value = googleTtsKey;
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('recDate').value = today;
+}
+
+// ===== NAVIGATION =====
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== CHECKS =====
+const DIFF_LABEL = { easy:'직접 가능', mid:'주의 필요', hard:'정비소 권장' };
+const DIFF_CLASS = { easy:'badge-easy', mid:'badge-mid', hard:'badge-hard' };
+
+function renderChecks() {
+  ['engine','brake','elec','cabin','consumable'].forEach(cat => {
+    const container = document.getElementById('checkList-'+cat);
+    container.innerHTML = CHECK_DATA[cat].map(item => {
+      const done = checks[item.id] ? 'done' : '';
+      return `<div class="check-item ${done}">
+        <div class="check-box" onclick="toggleCheck('${item.id}',this.parentElement)">${done?'✓':''}</div>
+        <div class="check-label" onclick="toggleCheck('${item.id}',this.parentElement)" style="cursor:pointer;">
+          <div class="name">${item.name}</div>
+          <div class="desc">${item.desc}</div>
+          <div class="interval">⏱ ${item.interval}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <span class="check-badge ${DIFF_CLASS[item.diff]}">${DIFF_LABEL[item.diff]}</span>
+          <button onclick="showCheckDetail('${item.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:14px;padding:3px 8px;cursor:pointer;white-space:nowrap;">📖 설명</button>
+        </div>
+      </div>`;
+    }).join('');
+  });
+  updateSummary();
+}
+
+function showCheckDetail(id) {
+  const item = Object.values(CHECK_DATA).flat().find(i => i.id === id);
+  if(!item) return;
+  document.getElementById('checkDetailContent').innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+        <div class="modal-title" style="flex:1;">${item.name}</div>
+        <button class="tts-btn" id="ttsDetailBtn" onclick="ttsDetail('${id}')"><span class="tts-icon">🔊</span> 읽기</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+        <span class="check-badge ${DIFF_CLASS[item.diff]}">${DIFF_LABEL[item.diff]}</span>
+        <span style="font-size:16px;color:var(--accent2);">⏱ ${item.interval}</span>
+      </div>
+    </div>
+    <div id="detailText" style="background:var(--surface2);border-radius:10px;padding:16px;font-size:18px;line-height:1.9;white-space:pre-line;color:var(--text);">${item.detail}</div>
+    <button class="btn btn-outline" onclick="stopTTS();closeModal('checkDetailModal')" style="margin-top:14px;">닫기</button>
+  `;
+  openModal('checkDetailModal');
+}
+
+function toggleCheck(id, el) {
+  if(checks[id]) { delete checks[id]; el.classList.remove('done'); el.querySelector('.check-box').textContent = ''; }
+  else { checks[id] = true; el.classList.add('done'); el.querySelector('.check-box').textContent = '✓'; }
+  localStorage.setItem('carChecks', JSON.stringify(checks));
+  updateSummary();
+}
+
+
+function updateSummary() {
+  const total = Object.values(CHECK_DATA).flat().length;
+  const done = Object.keys(checks).length;
+  document.getElementById('sumTotal').textContent = total;
+  document.getElementById('sumDone').textContent = done;
+  document.getElementById('sumLeft').textContent = total - done;
+}
+
+function resetChecks() {
+  if(confirm('모든 체크 항목을 초기화할까요?')) {
+    checks = {}; localStorage.setItem('carChecks','{}');
+    renderChecks();
+  }
+}
+
+// ===== RECORDS =====
+const REC_COLORS = {
+  '엔진오일 교환':'var(--accent)','타이어 교환':'var(--green)','브레이크 패드 교환':'var(--red)',
+  '배터리 교환':'var(--accent2)','기타':'var(--text3)'
+};
+
+function addRecord() {
+  const type = document.getElementById('recType').value;
+  const km = parseInt(document.getElementById('recKm').value);
+  const date = document.getElementById('recDate').value;
+  const note = document.getElementById('recNote').value.trim();
+  if(!km || !date) { alert('주행거리와 날짜를 입력해주세요.'); return; }
+  const rec = { id: Date.now(), type, km, date, note };
+  records.unshift(rec);
+  lastRecordKm[type] = km;
+  localStorage.setItem('carRecords', JSON.stringify(records));
+  localStorage.setItem('lastRecordKm', JSON.stringify(lastRecordKm));
+  document.getElementById('recKm').value = '';
+  document.getElementById('recNote').value = '';
+  renderRecords();
+  updateReminders();
+}
+
+function renderRecords() {
+  const container = document.getElementById('recordList');
+  if(!records.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🗒️</div><p>아직 정비 기록이 없습니다.<br>첫 번째 기록을 추가해보세요.</p></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="record-list">${records.map(r => {
+    const color = REC_COLORS[r.type] || 'var(--blue)';
+    return `<div class="record-item">
+      <div class="record-dot" style="background:${color}"></div>
+      <div class="record-info" style="flex:1;">
+        <div class="type">${r.type}</div>
+        <div class="record-km">📍 ${r.km.toLocaleString()} km</div>
+        ${r.note ? `<div class="detail">${r.note}</div>` : ''}
+        <div class="date">📅 ${r.date}</div>
+      </div>
+      <button class="record-delete" onclick="deleteRecord(${r.id})">×</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function deleteRecord(id) {
+  if(!confirm('이 기록을 삭제할까요?')) return;
+  records = records.filter(r => r.id !== id);
+  localStorage.setItem('carRecords', JSON.stringify(records));
+  renderRecords();
+}
+
+// ===== WARNINGS =====
+function renderWarnings() {
+  document.getElementById('warningGrid').innerHTML = WARNING_DATA.map((w,i) => `
+    <div class="warning-card" onclick="showWarning(${i})">
+      <div class="warning-icon">${w.icon}</div>
+      <div class="warning-name">${w.name}</div>
+      <span class="warning-urgency urgency-${w.urgency}">${w.urgLabel}</span>
+    </div>`).join('');
+}
+
+function showWarning(i) {
+  const w = WARNING_DATA[i];
+  document.getElementById('warnModalContent').innerHTML = `
+    <div style="font-size:52px;text-align:center;margin-bottom:12px;">${w.icon}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div class="modal-title" style="margin-bottom:0;">${w.name}</div>
+      <button class="tts-btn" id="ttsWarnBtn" onclick="ttsSpeak('${w.name}. ${w.detail.replace(/'/g,"\\'")}', 'ttsWarnBtn')"><span class="tts-icon">🔊</span> 읽기</button>
+    </div>
+    <span class="warning-urgency urgency-${w.urgency}" style="display:block;margin-bottom:16px;">${w.urgLabel}</span>
+    <div style="background:var(--surface2);border-radius:10px;padding:14px;font-size:18px;line-height:1.9;white-space:pre-line;color:var(--text);">${w.detail}</div>
+    <button class="btn btn-outline" onclick="stopTTS();closeModal('warnModal')" style="margin-top:12px;">닫기</button>
+  `;
+  openModal('warnModal');
+}
+
+// ===== REMINDERS =====
+function updateReminders() {
+  const inputKm = parseInt(document.getElementById('currentKm').value) || carInfo.km || 0;
+  renderReminders(inputKm);
+}
+
+function renderReminders(currentKm) {
+  currentKm = currentKm || parseInt(document.getElementById('currentKm').value) || carInfo.km || 0;
+  const container = document.getElementById('reminderList');
+
+  const items = REMINDER_DATA.map(r => {
+    const lastKm = lastRecordKm[r.name] || 0;
+    const nextKm = lastKm + r.km;
+    const remaining = nextKm - currentKm;
+    const pct = Math.min(100, Math.max(0, ((currentKm - lastKm) / r.km) * 100));
+    let status, label;
+    if(remaining < 0) { status='over'; label=`${Math.abs(remaining).toLocaleString()}km 초과`; }
+    else if(remaining < r.km * 0.15) { status='soon'; label=`${remaining.toLocaleString()}km 남음`; }
+    else { status='ok'; label=`${remaining.toLocaleString()}km 남음`; }
+    return { ...r, pct, status, label, lastKm, nextKm };
+  });
+
+  // sort: over first, soon, ok
+  items.sort((a,b) => {
+    const o = {over:0,soon:1,ok:2};
+    return o[a.status] - o[b.status];
+  });
+
+  container.innerHTML = items.map(r => `
+    <div class="reminder-item">
+      <div class="reminder-icon">${r.icon}</div>
+      <div class="reminder-info">
+        <div class="reminder-name">${r.name}</div>
+        <div class="reminder-sub">마지막: ${r.lastKm ? r.lastKm.toLocaleString()+'km' : '기록 없음'} | 주기: ${r.km.toLocaleString()}km</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${r.pct}%;background:${r.color}"></div>
+        </div>
+      </div>
+      <span class="reminder-status status-${r.status}">${r.label}</span>
+    </div>`).join('');
+}
+
+// ===== MODAL =====
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function openCarSetup() {
+  if(carInfo.model) document.getElementById('carModel').value = carInfo.model;
+  if(carInfo.km) document.getElementById('carKm').value = carInfo.km;
+  if(carInfo.fuel) document.getElementById('carFuel').value = carInfo.fuel;
+  openModal('carModal');
+}
+
+function saveCarInfo() {
+  carInfo = {
+    model: document.getElementById('carModel').value,
+    km: parseInt(document.getElementById('carKm').value) || 0,
+    fuel: document.getElementById('carFuel').value,
+  };
+  localStorage.setItem('carInfo', JSON.stringify(carInfo));
+  document.getElementById('carBadge').textContent = '🚗 ' + (carInfo.model || '내 차');
+  document.getElementById('currentKm').value = carInfo.km;
+  closeModal('carModal');
+  renderReminders(carInfo.km);
+}
+
+// ===== API KEY =====
+function saveApiKey() {
+  apiKey = document.getElementById('apiKeyInput').value.trim();
+  localStorage.setItem('carApiKey', apiKey);
+  alert('API 키가 저장되었습니다.');
+}
+
+// ===== AI CHAT =====
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if(!msg) return;
+  if(!apiKey) { alert('먼저 API 키를 저장해 주세요.'); return; }
+
+  input.value = '';
+  appendBubble(msg, 'user');
+  chatHistory.push({ role:'user', content: msg });
+
+  const btn = document.getElementById('chatSendBtn');
+  btn.disabled = true;
+  const typingEl = appendTyping();
+
+  try {
+    const carContext = carInfo.model ? `사용자 차량: ${carInfo.model}, 연료: ${carInfo.fuel || '미등록'}, 주행거리: ${carInfo.km || '미등록'}km\n` : '';
+    const systemPrompt = `당신은 자동차 전문 정비 진단 AI입니다. ${carContext}
+사용자의 자동차 증상을 듣고 다음 형식으로 답변하세요:
+
+🔴/🟡/🟢 **긴급도**: [즉시 정비소 / 조기 점검 권장 / 주의 관찰 중]
+**가능한 원인**: (1~3가지 간결하게)
+**권장 조치**: (단계별로 명확하게)
+**주의사항**: (안전 관련 경고가 있으면)
+
+전문 용어는 괄호로 설명하고, 300자 이내로 간결하게 답변하세요. 애매한 증상은 더 자세한 정보를 물어보세요.`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 600,
+        system: systemPrompt,
+        messages: chatHistory
+      })
+    });
+
+    const data = await response.json();
+    typingEl.remove();
+
+    if(data.error) throw new Error(data.error.message);
+    const reply = data.content[0].text;
+    chatHistory.push({ role:'assistant', content: reply });
+    appendBubble(reply, 'ai');
+  } catch(e) {
+    typingEl.remove();
+    appendBubble('오류가 발생했습니다: ' + e.message + '\nAPI 키를 확인해주세요.', 'ai');
+  }
+  btn.disabled = false;
+}
+
+function appendBubble(text, role) {
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = `chat-bubble bubble-${role}`;
+  div.style.cssText = 'white-space:pre-wrap;word-break:break-word;';
+  div.textContent = text;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+function appendTyping() {
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'bubble-ai chat-bubble';
+  div.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+// ===== TTS (Google Cloud Text-to-Speech) =====
+let ttsAudio = null;
+let ttsCurrentBtn = null;
+let googleTtsKey = localStorage.getItem('googleTtsKey') || '';
+
+function saveGoogleTtsKey() {
+  googleTtsKey = document.getElementById('googleTtsKeyInput').value.trim();
+  localStorage.setItem('googleTtsKey', googleTtsKey);
+  const msg = document.getElementById('googleTtsKeyMsg');
+  msg.textContent = '저장되었습니다 ✓';
+  setTimeout(() => { msg.textContent = ''; }, 2000);
+}
+
+function cleanTextForTTS(text) {
+  return text
+    .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')  // 이모지 제거
+    .replace(/[①②③④⑤]/g, '')
+    .replace(/•/g, '')
+    .replace(/\n+/g, ' ')
+    .trim();
+}
+
+function stopTTS() {
+  if(ttsAudio) { ttsAudio.pause(); ttsAudio = null; }
+  if(ttsCurrentBtn) {
+    const btn = document.getElementById(ttsCurrentBtn);
+    if(btn) { btn.classList.remove('playing'); btn.innerHTML = '<span class="tts-icon">🔊</span> 읽기'; }
+    ttsCurrentBtn = null;
+  }
+}
+
+async function ttsSpeak(text, btnId) {
+  if(!googleTtsKey) {
+    alert('Google Cloud TTS API 키를 먼저 설정 탭에서 입력해 주세요.');
+    return;
+  }
+  // 재생 중이면 정지
+  if(ttsCurrentBtn === btnId) { stopTTS(); return; }
+  stopTTS();
+
+  const btn = document.getElementById(btnId);
+  if(btn) { btn.classList.add('playing'); btn.innerHTML = '<span class="tts-icon">⏳</span> 로딩...'; }
+  ttsCurrentBtn = btnId;
+
+  const clean = cleanTextForTTS(text);
+  try {
+    const res = await fetch(
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${googleTtsKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: { text: clean },
+          voice: { languageCode: 'ko-KR', name: 'ko-KR-Wavenet-A', ssmlGender: 'FEMALE' },
+          audioConfig: { audioEncoding: 'MP3', speakingRate: 0.95, pitch: 0.0 }
+        })
+      }
+    );
+    if(!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || '오류 발생');
+    }
+    const data = await res.json();
+    const audioSrc = 'data:audio/mp3;base64,' + data.audioContent;
+    ttsAudio = new Audio(audioSrc);
+
+    if(btn) { btn.classList.add('playing'); btn.innerHTML = '<span class="tts-icon">⏹</span> 정지'; }
+
+    ttsAudio.onended = () => {
+      if(btn) { btn.classList.remove('playing'); btn.innerHTML = '<span class="tts-icon">🔊</span> 읽기'; }
+      ttsCurrentBtn = null; ttsAudio = null;
+    };
+    ttsAudio.onerror = () => {
+      if(btn) { btn.classList.remove('playing'); btn.innerHTML = '<span class="tts-icon">🔊</span> 읽기'; }
+      ttsCurrentBtn = null; ttsAudio = null;
+    };
+    ttsAudio.play();
+  } catch(e) {
+    if(btn) { btn.classList.remove('playing'); btn.innerHTML = '<span class="tts-icon">🔊</span> 읽기'; }
+    ttsCurrentBtn = null;
+    alert('TTS 오류: ' + e.message + '\nAPI 키 또는 권한을 확인해 주세요.');
+  }
+}
+
+function ttsDetail(id) {
+  const item = Object.values(CHECK_DATA).flat().find(i => i.id === id);
+  if(!item) return;
+  ttsSpeak(`${item.name}. ${item.detail}`, 'ttsDetailBtn');
+}
+
+// ===== INIT =====
+init();
+renderReminders();
+</script>
+</body>
+</html>
