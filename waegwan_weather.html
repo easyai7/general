@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1b5fbf">
+<title>왜관읍 날씨 · 실시간 일기예보</title>
+<meta property="og:title" content="왜관읍 날씨 · 실시간 일기예보">
+<meta property="og:description" content="왜관읍민을 위한 지금 날씨, 시간별·7일 예보, 미세먼지">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eaf0f4;
+    --card: #ffffff;
+    --ink: #13242d;
+    --muted: #566a74;
+    --line: #dce5ea;
+    --good: #1c8a4a;
+    --normal: #2b6cb0;
+    --bad: #c2610c;
+    --worst: #b3261e;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b141a;
+      --card: #14232c;
+      --ink: #e8f0f3;
+      --muted: #9db1ba;
+      --line: #26404b;
+      --good: #4cc982;
+      --normal: #6fa8e8;
+      --bad: #f0a050;
+      --worst: #ff8a80;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    word-break: keep-all;
+  }
+  .app { max-width: 640px; margin: 0 auto; padding: 16px 16px 40px; }
+
+  /* 상단 */
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 2px 14px; }
+  .top h1 { margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.02em; }
+  .top .when { font-size: 14px; color: var(--muted); }
+  .refresh {
+    flex: none;
+    padding: 10px 16px;
+    border: 0; border-radius: 12px;
+    background: #1b5fbf; color: #fff;
+    font: inherit; font-size: 16px; font-weight: 700;
+    cursor: pointer;
+  }
+  .refresh:active { transform: scale(.97); }
+  .refresh:focus-visible { outline: 3px solid #f6c453; outline-offset: 2px; }
+
+  /* 지금 날씨 */
+  .hero {
+    color: #fff;
+    border-radius: 24px;
+    padding: 26px 24px 24px;
+    text-align: center;
+    background: linear-gradient(160deg, #1b5fbf, #2e86d6);
+    box-shadow: 0 10px 28px rgba(0,0,0,.18);
+  }
+  body[data-theme="cloudy"] .hero { background: linear-gradient(160deg, #475a68, #6b7f8e); }
+  body[data-theme="rainy"]  .hero { background: linear-gradient(160deg, #263a52, #416080); }
+  body[data-theme="snowy"]  .hero { background: linear-gradient(160deg, #3f6086, #688db0); }
+  body[data-theme="night"]  .hero { background: linear-gradient(160deg, #0d1c3a, #26396b); }
+  .hero .icon { font-size: 76px; line-height: 1.1; }
+  .hero .temp { font-size: 76px; font-weight: 900; line-height: 1.05; letter-spacing: -0.04em; }
+  .hero .temp small { font-size: 34px; font-weight: 700; margin-left: 2px; }
+  .hero .desc { margin-top: 4px; font-size: 26px; font-weight: 700; }
+  .hero .range { margin-top: 6px; font-size: 18px; opacity: .92; }
+
+  /* 카드 공통 */
+  .card {
+    margin-top: 16px;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px 20px 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  }
+  .card h2 { margin: 0 0 8px; font-size: 20px; font-weight: 900; }
+  .card .sub { margin: -4px 0 8px; font-size: 14px; color: var(--muted); }
+
+  /* 오늘 안내 */
+  .tips { list-style: none; margin: 0; padding: 0 0 12px; }
+  .tips li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 19px; font-weight: 500; }
+  .tips li:first-child { border-top: 0; }
+
+  /* 한 줄씩 보여주는 목록 */
+  .rows { margin: 0; padding: 0; list-style: none; }
+  .rows li {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+  }
+  .rows li:first-child { border-top: 0; }
+  .rows .k { color: var(--muted); font-size: 17px; }
+  .rows .v { font-weight: 700; font-size: 19px; text-align: right; }
+  .grade {
+    display: inline-block; margin-left: 8px;
+    padding: 2px 10px; border-radius: 999px;
+    font-size: 15px; font-weight: 700; color: #fff;
+  }
+  .g-good { background: var(--good); }
+  .g-normal { background: var(--normal); }
+  .g-bad { background: var(--bad); }
+  .g-worst { background: var(--worst); }
+  @media (prefers-color-scheme: dark) { .grade { color: #0b141a; } }
+
+  /* 시간별·일별 */
+  .fc li { display: grid; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+  .fc li:first-child { border-top: 0; }
+  .hourly li { grid-template-columns: 5.2em 2em 1fr auto; gap: 8px; }
+  .daily  li { grid-template-columns: 4em 2em 1fr auto; gap: 8px; }
+  .fc .t { font-weight: 700; }
+  .fc .e { font-size: 26px; text-align: center; }
+  .fc .d { color: var(--muted); font-size: 15px; }
+  .fc .r { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .fc .r .rain { display: block; font-size: 14px; font-weight: 500; color: var(--normal); }
+
+  /* 상태 메시지 */
+  .msg {
+    margin-top: 16px; padding: 18px 20px;
+    border-radius: 16px;
+    background: var(--card);
+    border: 2px solid var(--bad);
+    font-size: 18px;
+  }
+  .msg b { display: block; margin-bottom: 4px; }
+  .loading { text-align: center; padding: 60px 0; color: var(--muted); font-size: 20px; }
+
+  footer { margin-top: 28px; text-align: center; color: var(--muted); font-size: 14px; line-height: 1.7; }
+  footer .by { margin-top: 10px; font-size: 16px; color: var(--ink); font-weight: 700; }
+
+  @media (max-width: 400px) {
+    body { font-size: 17px; }
+    .hero .temp, .hero .icon { font-size: 64px; }
+  }
+</style>
+</head>
+<body data-theme="sunny">
+<div class="app">
+
+  <div class="top">
+    <div>
+      <h1>왜관읍 날씨</h1>
+      <div class="when" id="when">불러오는 중…</div>
+    </div>
+    <button class="refresh" id="refresh" type="button">새로고침</button>
+  </div>
+
+  <div id="content"><div class="loading">날씨를 불러오는 중입니다…</div></div>
+
+  <footer>
+    <div>예보 자료: Open-Meteo (기상 모델 기반 · 10분마다 자동 갱신)</div>
+    <div>미세먼지는 모델 추정값이라 에어코리아 공식 측정값과 다를 수 있습니다.</div>
+    <div>기상특보 등 중요한 정보는 기상청(weather.go.kr)을 확인하세요.</div>
+    <div class="by">제작 : 전승대</div>
+  </footer>
+</div>
+
+<noscript><p style="padding:20px">이 앱은 자바스크립트가 켜져 있어야 동작합니다.</p></noscript>
+
+<script>
+(function () {
+  // 왜관읍 중심 좌표
+  var LAT = 35.9936, LON = 128.4018;
+  var REFRESH_MS = 10 * 60 * 1000;
+
+  var FORECAST_URL =
+    'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON +
+    '&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,is_day' +
+    '&hourly=temperature_2m,precipitation_probability,weather_code' +
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max' +
+    '&timezone=Asia%2FSeoul&wind_speed_unit=ms&forecast_days=7';
+  var AIR_URL =
+    'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + LAT + '&longitude=' + LON +
+    '&current=pm10,pm2_5&timezone=Asia%2FSeoul';
+
+  // 날씨 코드 → 한글 설명, 그림
+  var WMO = {
+    0:['맑음','☀️','🌙'], 1:['대체로 맑음','🌤️','🌙'], 2:['구름 조금','⛅','☁️'], 3:['흐림','☁️','☁️'],
+    45:['안개','🌫️','🌫️'], 48:['안개','🌫️','🌫️'],
+    51:['약한 이슬비','🌦️','🌧️'], 53:['이슬비','🌦️','🌧️'], 55:['강한 이슬비','🌧️','🌧️'],
+    56:['어는 이슬비','🌧️','🌧️'], 57:['어는 이슬비','🌧️','🌧️'],
+    61:['약한 비','🌧️','🌧️'], 63:['비','🌧️','🌧️'], 65:['강한 비','🌧️','🌧️'],
+    66:['어는 비','🌧️','🌧️'], 67:['강한 어는 비','🌧️','🌧️'],
+    71:['약한 눈','🌨️','🌨️'], 73:['눈','🌨️','🌨️'], 75:['강한 눈','❄️','❄️'], 77:['싸락눈','🌨️','🌨️'],
+    80:['약한 소나기','🌦️','🌧️'], 81:['소나기','🌧️','🌧️'], 82:['강한 소나기','🌧️','🌧️'],
+    85:['눈 소나기','🌨️','🌨️'], 86:['강한 눈 소나기','🌨️','🌨️'],
+    95:['천둥번개','⛈️','⛈️'], 96:['우박 동반 천둥번개','⛈️','⛈️'], 99:['강한 우박 천둥번개','⛈️','⛈️']
+  };
+  function wmo(code, isDay) {
+    var w = WMO[code] || ['날씨 정보','🌡️','🌡️'];
+    return { text: w[0], icon: (isDay === 0 ? w[2] : w[1]) };
+  }
+  function themeOf(code, isDay) {
+    if ([95,96,99,51,53,55,56,57,61,63,65,66,67,80,81,82].indexOf(code) >= 0) return 'rainy';
+    if ([71,73,75,77,85,86].indexOf(code) >= 0) return 'snowy';
+    if (isDay === 0) return 'night';
+    if ([2,3,45,48].indexOf(code) >= 0) return 'cloudy';
+    return 'sunny';
+  }
+  function isWet(code) {
+    return [51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99].indexOf(code) >= 0;
+  }
+  function isSnow(code) { return [71,73,75,77,85,86].indexOf(code) >= 0; }
+
+  function num(v, digits) {
+    if (v === null || v === undefined || isNaN(v)) return '-';
+    return Number(v).toFixed(digits === undefined ? 0 : digits);
+  }
+  function deg(v) { return num(v) + '°'; }
+
+  var DIRS = ['북','북동','동','남동','남','남서','서','북서'];
+  function windText(speed, dir) {
+    if (speed === null || speed === undefined) return '-';
+    var d = DIRS[Math.round((dir || 0) / 45) % 8];
+    var s = speed < 1 ? '바람 거의 없음' : d + '풍 ' + num(speed, 1) + ' m/s';
+    return s;
+  }
+  function windLabel(speed) {
+    if (speed === null || speed === undefined) return '';
+    if (speed < 4) return '약함';
+    if (speed < 9) return '약간 강함';
+    if (speed < 14) return '강함';
+    return '매우 강함';
+  }
+
+  // 미세먼지 등급(국내 환경부 기준)
+  function pm10Grade(v) {
+    if (v === null || v === undefined) return null;
+    if (v <= 30) return ['좋음','g-good',0];
+    if (v <= 80) return ['보통','g-normal',1];
+    if (v <= 150) return ['나쁨','g-bad',2];
+    return ['매우 나쁨','g-worst',3];
+  }
+  function pm25Grade(v) {
+    if (v === null || v === undefined) return null;
+    if (v <= 15) return ['좋음','g-good',0];
+    if (v <= 35) return ['보통','g-normal',1];
+    if (v <= 75) return ['나쁨','g-bad',2];
+    return ['매우 나쁨','g-worst',3];
+  }
+  function uvLabel(v) {
+    if (v === null || v === undefined) return '-';
+    var t = v < 3 ? '낮음' : v < 6 ? '보통' : v < 8 ? '높음' : v < 11 ? '매우 높음' : '위험';
+    return num(v, 0) + ' (' + t + ')';
+  }
+
+  function hourLabel(t) {
+    var h = parseInt(t.slice(11, 13), 10);
+    if (h === 0) return '자정';
+    if (h === 12) return '낮 12시';
+    return h < 12 ? '오전 ' + h + '시' : '오후 ' + (h - 12) + '시';
+  }
+  function whenLabel(t) {
+    var h = parseInt(t.slice(11, 13), 10), m = t.slice(14, 16);
+    var ap = h < 12 ? '오전' : '오후';
+    var hh = h % 12 === 0 ? 12 : h % 12;
+    return ap + ' ' + hh + ':' + m + ' 기준';
+  }
+  var DAYNAMES = ['일','월','화','수','목','금','토'];
+  function dayLabel(dateStr, i) {
+    if (i === 0) return '오늘';
+    if (i === 1) return '내일';
+    if (i === 2) return '모레';
+    var p = dateStr.split('-');
+    return DAYNAMES[new Date(+p[0], +p[1] - 1, +p[2]).getDay()] + '요일';
+  }
+  function md(dateStr) {
+    var p = dateStr.split('-');
+    return (+p[1]) + '/' + (+p[2]);
+  }
+
+  // 오늘의 생활 안내
+  function buildTips(f, air) {
+    var c = f.current, d = f.daily, tips = [];
+    var rainP = d.precipitation_probability_max ? d.precipitation_probability_max[0] : null;
+    if (isWet(c.weather_code) || (c.precipitation || 0) > 0) tips.push('☔ 지금 비가 내리고 있습니다. 우산을 챙기세요.');
+    else if (rainP !== null && rainP >= 60) tips.push('☔ 오늘 비 올 확률이 높습니다(' + rainP + '%). 우산을 꼭 챙기세요.');
+    else if (rainP !== null && rainP >= 30) tips.push('🌂 소나기가 올 수 있습니다(' + rainP + '%). 접이우산이 있으면 좋습니다.');
+    if (isSnow(c.weather_code)) tips.push('❄️ 눈이 내립니다. 길이 미끄러우니 천천히 걸으세요.');
+
+    var feel = c.apparent_temperature;
+    if (feel !== null && feel !== undefined) {
+      if (feel <= -5) tips.push('🧥 매우 춥습니다. 두꺼운 외투와 장갑, 목도리를 꼭 하세요. 빙판길을 조심하세요.');
+      else if (feel <= 5) tips.push('🧥 춥습니다. 두툼한 겉옷을 입으세요.');
+      else if (feel <= 12) tips.push('🧣 쌀쌀합니다. 겉옷을 챙기세요.');
+      else if (feel >= 33) tips.push('🥵 폭염 수준입니다. 한낮 야외 활동을 피하고 물을 자주 드세요.');
+      else if (feel >= 28) tips.push('💧 덥습니다. 물을 자주 마시고 그늘에서 쉬세요.');
+    }
+    var tmax = d.temperature_2m_max[0], tmin = d.temperature_2m_min[0];
+    if (tmax !== null && tmin !== null && tmax - tmin >= 10) tips.push('🌡️ 오늘 일교차가 ' + num(tmax - tmin) + '도로 큽니다. 입고 벗기 쉬운 옷이 좋습니다.');
+
+    if (air) {
+      var g10 = pm10Grade(air.pm10), g25 = pm25Grade(air.pm2_5);
+      var worst = Math.max(g10 ? g10[2] : 0, g25 ? g25[2] : 0);
+      if (worst >= 3) tips.push('😷 미세먼지가 매우 나쁩니다. 외출을 줄이고 마스크를 쓰세요.');
+      else if (worst === 2) tips.push('😷 미세먼지가 나쁩니다. 마스크를 쓰고 오래 있는 야외 활동은 줄이세요.');
+    }
+    var uv = d.uv_index_max ? d.uv_index_max[0] : null;
+    if (uv !== null && uv >= 8) tips.push('🧢 자외선이 매우 강합니다. 모자와 선크림을 챙기세요.');
+    else if (uv !== null && uv >= 6) tips.push('🧢 자외선이 강합니다. 낮에는 모자를 쓰세요.');
+
+    if (c.wind_speed_10m >= 10) tips.push('💨 바람이 강합니다. 간판·비닐하우스 등 날아갈 물건을 조심하세요.');
+    if (!tips.length) tips.push('🙂 오늘은 특별히 조심할 날씨가 없습니다. 좋은 하루 보내세요.');
+    return tips;
+  }
+
+  function render(f, air) {
+    var c = f.current, h = f.hourly, d = f.daily;
+    var info = wmo(c.weather_code, c.is_day);
+    document.body.setAttribute('data-theme', themeOf(c.weather_code, c.is_day));
+    document.getElementById('when').textContent = whenLabel(c.time);
+
+    var html = '';
+
+    // 1) 지금 날씨
+    html += '<section class="hero">' +
+      '<div class="icon">' + info.icon + '</div>' +
+      '<div class="temp">' + num(c.temperature_2m) + '<small>°C</small></div>' +
+      '<div class="desc">' + info.text + '</div>' +
+      '<div class="range">오늘 최저 ' + deg(d.temperature_2m_min[0]) + ' · 최고 ' + deg(d.temperature_2m_max[0]) + '</div>' +
+      '</section>';
+
+    // 2) 오늘 안내
+    html += '<section class="card"><h2>오늘 이렇게 하세요</h2><ul class="tips">' +
+      buildTips(f, air).map(function (t) { return '<li>' + t + '</li>'; }).join('') +
+      '</ul></section>';
+
+    // 3) 지금 상태
+    var pmRow = function (label, v, gradeFn) {
+      var g = gradeFn(v);
+      if (!g) return '<li><span class="k">' + label + '</span><span class="v">정보 없음</span></li>';
+      return '<li><span class="k">' + label + '</span><span class="v">' + num(v) + ' ㎍/㎥<span class="grade ' + g[1] + '">' + g[0] + '</span></span></li>';
+    };
+    var rainP0 = d.precipitation_probability_max ? d.precipitation_probability_max[0] : null;
+    html += '<section class="card"><h2>지금 상태</h2><ul class="rows">' +
+      '<li><span class="k">체감온도</span><span class="v">' + deg(c.apparent_temperature) + '</span></li>' +
+      '<li><span class="k">습도</span><span class="v">' + num(c.relative_humidity_2m) + '%</span></li>' +
+      '<li><span class="k">바람</span><span class="v">' + windText(c.wind_speed_10m, c.wind_direction_10m) +
+        (c.wind_speed_10m >= 1 ? ' (' + windLabel(c.wind_speed_10m) + ')' : '') + '</span></li>' +
+      '<li><span class="k">지금 내리는 비</span><span class="v">' + ((c.precipitation || 0) > 0 ? num(c.precipitation, 1) + ' mm' : '없음') + '</span></li>' +
+      '<li><span class="k">오늘 비 올 확률</span><span class="v">' + (rainP0 === null ? '-' : rainP0 + '%') + '</span></li>' +
+      pmRow('미세먼지 (PM10)', air ? air.pm10 : null, pm10Grade) +
+      pmRow('초미세먼지 (PM2.5)', air ? air.pm2_5 : null, pm25Grade) +
+      '<li><span class="k">오늘 자외선 최고</span><span class="v">' + uvLabel(d.uv_index_max ? d.uv_index_max[0] : null) + '</span></li>' +
+      '<li><span class="k">일출 / 일몰</span><span class="v">' + d.sunrise[0].slice(11, 16) + ' / ' + d.sunset[0].slice(11, 16) + '</span></li>' +
+      '</ul></section>';
+
+    // 4) 시간별 (3시간 간격, 앞으로 24시간)
+    var nowHour = c.time.slice(0, 13) + ':00';
+    var start = 0;
+    for (var i = 0; i < h.time.length; i++) { if (h.time[i] >= nowHour) { start = i; break; } }
+    var hrows = '';
+    for (var k = 0; k < 24 && start + k < h.time.length; k += 3) {
+      var idx = start + k;
+      var hh = parseInt(h.time[idx].slice(11, 13), 10);
+      var hi = wmo(h.weather_code[idx], (hh >= 6 && hh < 19) ? 1 : 0);
+      var rp = h.precipitation_probability ? h.precipitation_probability[idx] : null;
+      hrows += '<li><span class="t">' + (k === 0 ? '지금' : hourLabel(h.time[idx])) + '</span>' +
+        '<span class="e">' + hi.icon + '</span><span class="d">' + hi.text + '</span>' +
+        '<span class="r">' + deg(h.temperature_2m[idx]) +
+        (rp !== null && rp !== undefined ? '<span class="rain">비 ' + rp + '%</span>' : '') + '</span></li>';
+    }
+    html += '<section class="card"><h2>앞으로 24시간</h2><div class="sub">3시간 간격</div><ul class="rows fc hourly">' + hrows + '</ul></section>';
+
+    // 5) 7일 예보
+    var drows = '';
+    for (var j = 0; j < d.time.length; j++) {
+      var di = wmo(d.weather_code[j], 1);
+      var dp = d.precipitation_probability_max ? d.precipitation_probability_max[j] : null;
+      drows += '<li><span class="t">' + dayLabel(d.time[j], j) + '<br><span class="d">' + md(d.time[j]) + '</span></span>' +
+        '<span class="e">' + di.icon + '</span><span class="d">' + di.text + '</span>' +
+        '<span class="r">' + deg(d.temperature_2m_min[j]) + ' / ' + deg(d.temperature_2m_max[j]) +
+        (dp !== null && dp !== undefined ? '<span class="rain">비 ' + dp + '%</span>' : '') + '</span></li>';
+    }
+    html += '<section class="card"><h2>7일 예보</h2><div class="sub">최저 / 최고 기온</div><ul class="rows fc daily">' + drows + '</ul></section>';
+
+    document.getElementById('content').innerHTML = html;
+  }
+
+  function showError(hasData) {
+    var box = '<div class="msg"><b>날씨를 불러오지 못했습니다.</b>인터넷 연결을 확인하고 "새로고침"을 눌러 주세요.' +
+      (hasData ? ' (아래는 마지막으로 받은 정보입니다.)' : '') + '</div>';
+    var el = document.getElementById('content');
+    if (hasData) el.insertAdjacentHTML('afterbegin', box); else el.innerHTML = box;
+  }
+
+  var lastOk = 0, busy = false;
+  function getJson(url) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function load() {
+    if (busy) return;
+    busy = true;
+    var btn = document.getElementById('refresh');
+    btn.disabled = true; btn.textContent = '불러오는 중';
+    Promise.allSettled([getJson(FORECAST_URL), getJson(AIR_URL)]).then(function (res) {
+      if (res[0].status === 'fulfilled') {
+        var air = (res[1].status === 'fulfilled' && res[1].value && res[1].value.current) ? res[1].value.current : null;
+        render(res[0].value, air);
+        lastOk = Date.now();
+      } else {
+        console.warn('예보 요청 실패', res[0].reason);
+        showError(lastOk > 0);
+        if (!lastOk) document.getElementById('when').textContent = '불러오지 못함';
+      }
+    }).catch(function (e) {
+      console.warn(e);
+      showError(lastOk > 0);
+    }).then(function () {
+      busy = false;
+      btn.disabled = false; btn.textContent = '새로고침';
+    });
+  }
+
+  document.getElementById('refresh').addEventListener('click', load);
+  setInterval(load, REFRESH_MS);
+  // 앱을 다시 열었을 때 5분 넘게 지났으면 새로 불러오기
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && Date.now() - lastOk > 5 * 60 * 1000) load();
+  });
+  load();
+})();
+</script>
+</body>
+</html>
