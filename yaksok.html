@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>약속알람</title>
 <meta property="og:title" content="약속 알람 공유">
-<meta property="og:description" content="약속을 링크로 보내면 상대방 캘린더에 알람이 자동 설정됩니다">
+<meta property="og:description" content="약속을 링크로 보내면 상대방이 캘린더에 바로 저장할 수 있어요">
 <meta property="og:image" content="https://easyai7.github.io/general/yaksok.png">
 <meta property="og:url" content="https://easyai7.github.io/general/yaksok.html">
 <meta property="og:type" content="website">
@@ -516,7 +516,7 @@
     <div class="sender-header">
       <div class="chip">약속 알람</div>
       <h1>약속을 만들고<br><span>링크로 공유</span>하세요</h1>
-      <p>상대방이 링크를 열면 알람이 자동 설정됩니다</p>
+      <p>상대방이 링크를 열고 캘린더에 저장하면 됩니다</p>
     </div>
 
     <!-- 약속 정보 -->
@@ -585,7 +585,7 @@
       <div class="link-result">
         <div class="link-icon">🎉</div>
         <h2>링크가 생성됐어요!</h2>
-        <p>아래 링크를 복사해서 상대방에게 보내세요<br>링크를 열면 알람이 자동 설정됩니다</p>
+        <p>아래 링크를 복사해서 상대방에게 보내세요<br>아이폰은 알람까지 함께 저장되고,<br>구글 캘린더는 일정만 저장돼요</p>
         <div class="link-box" id="generatedLink"></div>
         <button class="btn-copy" onclick="copyLink()">📋 링크 복사하기</button>
         <button class="btn-share" onclick="shareKakao()">💛 카카오톡으로 공유</button>
@@ -607,6 +607,36 @@
   let selectedAlarmMin = 60;
   let countdownTimer = null;
   let currentEventData = null;
+
+  // ── 도우미: HTML 이스케이프 (링크 안의 글이 코드로 실행되지 않게) ──
+  function esc(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // ── 도우미: 링크용 인코딩 (+ / = 가 없는 URL 안전 방식) ──
+  function encodeData(obj) {
+    return btoa(encodeURIComponent(JSON.stringify(obj)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function decodeData(raw) {
+    let b = String(raw).replace(/ /g, '+').replace(/-/g, '+').replace(/_/g, '/');
+    while (b.length % 4) b += '=';
+    const d = JSON.parse(decodeURIComponent(atob(b)));
+    if (!d || typeof d.title !== 'string' || isNaN(new Date(d.datetime).getTime())) {
+      throw new Error('invalid event');
+    }
+    d.alarmMin = Number(d.alarmMin) || 60;
+    return d;
+  }
+
+  // ── 도우미: datetime-local 입력칸용 "내 시간대" 문자열 ──
+  function toLocalInput(d) {
+    const p = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+           'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
 
   // ── 알람 옵션 선택 ──
   function selectAlarm(el, min) {
@@ -635,8 +665,8 @@
       alarmMin: selectedAlarmMin
     };
 
-    const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
-    const url = `${window.location.href.split('?')[0]}?event=${encoded}`;
+    const encoded = encodeData(data);
+    const url = `${window.location.href.split('#')[0].split('?')[0]}?event=${encoded}`;
 
     document.getElementById('generatedLink').textContent = url;
     document.getElementById('linkResult').style.display = 'block';
@@ -692,13 +722,19 @@
         : `${data.alarmMin}분 전`;
 
     const isPast = alarmTime <= now;
+    const safe = {
+      title: esc(data.title),
+      sender: esc(data.sender),
+      location: esc(data.location),
+      memo: esc(data.memo).replace(/\n/g, '<br>')
+    };
 
     const content = document.getElementById('receiverContent');
     content.innerHTML = `
       <div class="event-card">
         <div class="event-emoji pulse">📅</div>
-        <div class="event-title">${data.title}</div>
-        <div class="event-from">${data.sender ? `<span>${data.sender}</span>님이 약속을 보냈어요` : '약속이 도착했어요'}</div>
+        <div class="event-title">${safe.title}</div>
+        <div class="event-from">${data.sender ? `<span>${safe.sender}</span>님이 약속을 보냈어요` : '약속이 도착했어요'}</div>
 
         <div class="info-grid">
           <div class="info-row">
@@ -720,7 +756,7 @@
             <div class="info-icon">📍</div>
             <div class="info-content">
               <div class="info-key">장소</div>
-              <div class="info-val">${data.location}</div>
+              <div class="info-val">${safe.location}</div>
             </div>
           </div>` : ''}
           ${data.memo ? `
@@ -728,16 +764,17 @@
             <div class="info-icon">💬</div>
             <div class="info-content">
               <div class="info-key">메모</div>
-              <div class="info-val">${data.memo}</div>
+              <div class="info-val">${safe.memo}</div>
             </div>
           </div>` : ''}
         </div>
 
-        <div class="cal-guide">📲 아래 버튼을 누르면 내 폰 캘린더에 자동 저장돼요</div>
+        <div class="cal-guide">📲 아래 버튼으로 내 캘린더에 저장하세요<br>보낸 분이 정한 알람: <b>${alarmLabel}</b> (아이폰 .ics 저장에만 함께 들어가요)</div>
 
         <button class="btn-gcal" onclick="addGoogleCal(currentEventData)">
           <img src="https://ssl.gstatic.com/calendar/images/dynamiclogo_2020q4/calendar_20_2x.png" style="width:22px;height:22px;vertical-align:middle;margin-right:8px;border-radius:4px;">구글 캘린더에 저장
         </button>
+        <div style="font-size:12px;color:var(--muted);margin:-4px 0 12px;line-height:1.5;">※ 구글 캘린더는 일정만 저장돼요. 알림은 저장한 뒤 직접 지정해 주세요</div>
 
         <button class="btn-ical" onclick="addIcal(currentEventData)">
           🍎 아이폰 캘린더에 저장 (.ics)
@@ -775,33 +812,58 @@
     function fmt(d) {
       return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
     }
+    // ics 본문에서 쓸 수 없는 문자(쉼표, 세미콜론, 줄바꿈, 역슬래시) 처리
+    function icsEsc(t) {
+      return String(t == null ? '' : t)
+        .replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,')
+        .replace(/\r?\n/g, '\\n');
+    }
+    // 한 줄이 75바이트를 넘지 않도록 접기 (한글은 3바이트)
+    function fold(line) {
+      const enc = new TextEncoder();
+      let out = '', cur = '', bytes = 0;
+      for (const ch of line) {
+        const b = enc.encode(ch).length;
+        if (bytes + b > 72) { out += cur + '\r\n '; cur = ''; bytes = 1; }
+        cur += ch; bytes += b;
+      }
+      return out + cur;
+    }
 
     const alarmMin = data.alarmMin || 60;
-    const ics = [
+    const uid = Date.now() + '-' + Math.random().toString(36).slice(2) + '@yaksok';
+    const lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
+      'PRODID:-//yaksok//KO',
+      'CALSCALE:GREGORIAN',
       'BEGIN:VEVENT',
-      'SUMMARY:' + data.title,
+      'UID:' + uid,
+      'DTSTAMP:' + fmt(new Date()),
+      'SUMMARY:' + icsEsc(data.title),
       'DTSTART:' + fmt(dt),
       'DTEND:' + fmt(end),
-      'LOCATION:' + (data.location || ''),
-      'DESCRIPTION:' + (data.memo || ''),
+      'LOCATION:' + icsEsc(data.location),
+      'DESCRIPTION:' + icsEsc(data.memo),
       'BEGIN:VALARM',
       'TRIGGER:-PT' + alarmMin + 'M',
       'ACTION:DISPLAY',
-      'DESCRIPTION:' + data.title + ' 알람',
+      'DESCRIPTION:' + icsEsc(data.title + ' 알람'),
       'END:VALARM',
       'END:VEVENT',
       'END:VCALENDAR'
-    ].join('\r\n');
+    ];
+    const ics = lines.map(fold).join('\r\n') + '\r\n';
 
     const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = data.title + '.ics';
+    a.download = (data.title.replace(/[\\/:*?"<>|]/g, '').trim() || '약속') + '.ics';
+    a.style.display = 'none';
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 1500);
   }
 
   // ── 알람 설정 ──
@@ -912,7 +974,7 @@
     const raw = params.get('event');
     if (raw) {
       try {
-        const data = JSON.parse(decodeURIComponent(atob(raw)));
+        const data = decodeData(raw);
         renderReceiver(data);
       } catch(e) {
         showToast('링크가 올바르지 않아요');
@@ -922,7 +984,7 @@
       const now = new Date();
       now.setDate(now.getDate() + 1);
       now.setHours(12, 0, 0, 0);
-      document.getElementById('s_datetime').value = now.toISOString().slice(0, 16);
+      document.getElementById('s_datetime').value = toLocalInput(now);
     }
   }
 
